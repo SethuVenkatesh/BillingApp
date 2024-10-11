@@ -3,9 +3,6 @@ package com.sethu.billingsystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,16 +10,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "firms")
-public class Firm {
+@Table(name = "invoice_party")
+public class InvoiceParty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long firmId;
-    @Column(name = "firm_name")
-    private String firmName;
-    @Column(name = "logo_url")
-    private String logoUrl;
+    private Long invoicePartyId;
+    @Column(name = "party_name")
+    private String partyName;
     @Column(name = "email_id")
     private String email;
     @Column(name = "GST_number")
@@ -37,8 +32,6 @@ public class Firm {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
-    @OneToOne
-    private Customer user;
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -46,4 +39,6 @@ public class Firm {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToOne(mappedBy = "invoiceParty")
+    private Invoice invoice;
 }

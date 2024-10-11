@@ -14,29 +14,31 @@ public class FirmDTO {
     public interface View {
         interface External extends ResponseDTO.View.Public,AddressDTO.View.External,BankDTO.View.External{}
         interface Internal extends External {}
+        interface Create extends External{}
+        interface Update extends External{}
     }
     @JsonView(value = {FirmDTO.View.Internal.class})
     private Long firmId;
-    @Size(min = 5, max =25,message = "Firm Name must be 5 to 25 characters")
-    @JsonView(value = {FirmDTO.View.External.class})
+    @Size(groups = {FirmDTO.View.Create.class,FirmDTO.View.Update.class},min = 5, max =25,message = "Firm Name must be 5 to 25 characters")
+    @NotBlank(groups = {FirmDTO.View.Create.class},message = "Firm Name Cannot Be Blank")
+    @JsonView(value = {FirmDTO.View.Create.class,FirmDTO.View.Update.class,FirmDTO.View.External.class})
     private String firmName;
     @JsonView(value = {FirmDTO.View.External.class})
     private String logoUrl;
-    @Email(message = "Email is invalid")
+    @Email(groups = {FirmDTO.View.Update.class,FirmDTO.View.Create.class},message = "Email is invalid")
     @JsonView(value = {FirmDTO.View.External.class})
     private String email;
     @JsonView(value = {FirmDTO.View.External.class})
     private String gstNumber;
-    @Size(min = 10,max = 10,message = "Mobile Number is invalid")
+    @Size(groups = {FirmDTO.View.Update.class,FirmDTO.View.Create.class},min = 10,max = 10,message = "Mobile Number is invalid")
     @JsonView(value = {FirmDTO.View.External.class})
     private String mobileNumber;
-    @Size(min = 10,max = 10,message = "Mobile Number is invalid")
+    @Size(groups = {FirmDTO.View.Update.class,FirmDTO.View.Create.class},min = 10,max = 10,message = "Mobile Number is invalid")
     @JsonView(value = {FirmDTO.View.External.class})
     private String altMobileNumber;
     @JsonView(value = {FirmDTO.View.External.class})
     private BankDTO bank;
     @JsonView(value = {FirmDTO.View.External.class})
     private AddressDTO address;
-    @JsonView(value = {FirmDTO.View.External.class})
-    private UserDTO user;
+
 }

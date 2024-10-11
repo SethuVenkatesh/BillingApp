@@ -2,6 +2,10 @@ package com.sethu.billingsystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -23,8 +27,6 @@ public class Party {
     private String mobileNumber;
     @Column(name = "alt_mobile_number")
     private String altMobileNumber;
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
     @ManyToOne
     private Firm firm;
     @OneToOne(cascade = CascadeType.ALL)
@@ -33,4 +35,10 @@ public class Party {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

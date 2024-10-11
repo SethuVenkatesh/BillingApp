@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 @Service
@@ -33,15 +35,12 @@ public class FirmService {
     UserUtil userUtil;
     @Autowired
     FirmUtil firmUtil;
-    public ResponseEntity<ApiResponse<Object>> createFirm(FirmDTO firmDTO, String userName) {
-        logger.info("create Firm : userName : {} ; firm : {}",userName,firmDTO);
+    public ResponseEntity<ApiResponse<Object>> createFirm(FirmDTO firmDTO) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         boolean isAllNull = util.isNullAllFields(firmDTO);
         if(isAllNull){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Empty Values are passed for firm",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
@@ -53,7 +52,6 @@ public class FirmService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Firm Name Already exist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         Firm firm = new Firm();
         firmMapper.firmDTOTOFirm(firmDTO,firm);
         firm.setUser(user);
@@ -65,11 +63,9 @@ public class FirmService {
 
     }
 
-    public ResponseEntity<ApiResponse<Object>> getFirmDetails(String userName) {
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ApiResponse<Object>> getFirmDetails() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
         Firm firmDetails = firmRepository.findByUserUserId(user.getUserId());
         if(firmDetails == null){
@@ -83,15 +79,13 @@ public class FirmService {
         }
     }
 
-    public ResponseEntity<ApiResponse<Object>> updateFirm(FirmDTO firmDTO, String userName) {
+    public ResponseEntity<ApiResponse<Object>> updateFirm(FirmDTO firmDTO) {
         boolean isAllNull = util.isNullAllFields(firmDTO);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         logger.info("updateFirm : userName : {} ; firm : {}",userName,firmDTO);
         if(isAllNull){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Values to update",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);

@@ -27,22 +27,21 @@ public class FirmController {
     ModelMapper modelMapper;
     @PostMapping("/new")
     @JsonView(FirmDTO.View.External.class)
-    public ResponseEntity<ApiResponse<Object>> createFirm(@RequestParam(required = true) String userName, @RequestBody @Valid FirmDTO requestBody){
-        logger.info("create Firm : userName : {} ; requestBody : {}",userName,requestBody);
-        return firmService.createFirm(requestBody,userName);
+    public ResponseEntity<ApiResponse<Object>> createFirm(@RequestBody @Validated(value = {FirmDTO.View.Create.class}) @JsonView(value = {FirmDTO.View.Create.class}) FirmDTO requestBody){
+        return firmService.createFirm(requestBody);
     }
     @GetMapping("/details")
     @JsonView(FirmDTO.View.External.class)
-    public ResponseEntity<ApiResponse<Object>> getFirmDetails(@RequestParam(required = true) String userName)
+    public ResponseEntity<ApiResponse<Object>> getFirmDetails()
     {
-        return firmService.getFirmDetails(userName);
+        return firmService.getFirmDetails();
     }
 
     @PatchMapping("/update")
     @JsonView(FirmDTO.View.External.class)
-    public ResponseEntity<ApiResponse<Object>> updateFirm(@RequestParam(required = true) String userName,@RequestBody  @Valid FirmDTO requestBody)
+    public ResponseEntity<ApiResponse<Object>> updateFirm(@RequestBody @Validated(value = FirmDTO.View.Update.class) @JsonView(value = {FirmDTO.View.Update.class}) FirmDTO requestBody)
     {
-       return firmService.updateFirm(requestBody,userName);
+       return firmService.updateFirm(requestBody);
     }
 
 }

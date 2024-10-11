@@ -2,6 +2,10 @@ package com.sethu.billingsystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -20,7 +24,15 @@ public class Customer {
     @Column(name = "profile_url")
     private String profileUrl;
     @Column(name = "role")
-    private String role;
+    private String role="user";
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+
     @Override
     public String toString() {
         return "User{" +

@@ -19,8 +19,8 @@ public class Address {
     private String city;
     private String state;
     private Long pincode;
-    @OneToOne(mappedBy = "address")
-    private Firm firm;
-    @OneToOne(mappedBy = "address")
-    private Party party;
+//    @OneToOne(mappedBy = "address")
+//    private Firm firm;
+//    @OneToOne(mappedBy = "address")
+//    private Party party;
 }

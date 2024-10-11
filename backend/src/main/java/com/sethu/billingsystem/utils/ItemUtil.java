@@ -13,5 +13,9 @@ public class ItemUtil {
         Item item = itemRepository.findByItemNameAndPartyPartyName(itemName,partyName);
         return item!=null;
     }
+    public boolean checkItemExsistById(Long id,String partyName){
+        Item item = itemRepository.findByItemIdAndPartyPartyName(id,partyName);
+        return item!=null;
+    }
 
 }

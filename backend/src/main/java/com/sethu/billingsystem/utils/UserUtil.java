@@ -14,7 +14,10 @@ public class UserUtil {
         Customer user = userRepository.findOneByUserName(userName);
         return user != null;
     }
-
+    public boolean checkEmailExsist(String email){
+        Customer user = userRepository.findOneByEmail(email);
+        return user != null;
+    }
     public Customer getUserDetails(String userName){
         return userRepository.findOneByUserName(userName);
     }

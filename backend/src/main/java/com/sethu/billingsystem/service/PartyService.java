@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,15 +47,13 @@ public class PartyService {
     FirmUtil firmUtil;
     @Autowired
     PartyUtil partyUtil;
-    public ResponseEntity<ApiResponse<Object>> createParty(String firmName, String userName, PartyDTO requestBody) {
+    public ResponseEntity<ApiResponse<Object>> createParty(PartyDTO requestBody) {
         boolean isAllNull = util.isNullAllFields(requestBody);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         logger.info("create Party : userName : {} ; party : {}",userName,requestBody);
         if(isAllNull){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Values to update",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
@@ -62,11 +62,7 @@ public class PartyService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!firm.getFirmName().equals(firmName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User are not authorised to add party in this firm",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(partyUtil.checkPartyExsist(requestBody.getPartyName(), firmName)){
+        if(partyUtil.checkPartyExsist(requestBody.getPartyName(), firm.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -79,15 +75,13 @@ public class PartyService {
         ApiResponse<Object> response =new  ApiResponse<>(true,"Firm is Created",partyDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    public ResponseEntity<ApiResponse<Object>> updateParty(String userName, String firmName, String partyName, PartyDTO requestBody) {
+    public ResponseEntity<ApiResponse<Object>> updateParty(String partyName, PartyDTO requestBody) {
         boolean isAllNull = util.isNullAllFields(requestBody);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         logger.info("create Party : userName : {} ; party : {}",userName,requestBody);
         if(isAllNull){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Values to update",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
@@ -96,19 +90,15 @@ public class PartyService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!firm.getFirmName().equals(firmName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User are not authorised to add party in this firm",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!partyUtil.checkPartyExsist(partyName, firmName)){
+        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(partyUtil.checkPartyExsist(requestBody.getPartyName(), firmName)){
+        if(partyUtil.checkPartyExsist(requestBody.getPartyName(), firm.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = partyUtil.getPartyDetails(partyName,firmName);
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
         partyMapper.partyDTOTOParty(requestBody,party);
         Party updatedParty = partyRepository.save(party);
         PartyDTO partyDTO = new PartyDTO();
@@ -117,26 +107,20 @@ public class PartyService {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<ApiResponse<Object>> getPartyDetails(String userName, String firmName, String partyName) {
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ApiResponse<Object>> getPartyDetails(String partyName) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
         if(!firmUtil.checkFirmExsist(user.getUserId())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!firm.getFirmName().equals(firmName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User are not authorised to this firm",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!partyUtil.checkPartyExsist(partyName, firmName)){
+        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = partyUtil.getPartyDetails(partyName,firmName);
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
         PartyDTO partyDTO= new PartyDTO();
         partyMapper.partyToPartyDTO(party,partyDTO);
         ApiResponse<Object> response =new  ApiResponse<>(true,"Firm Details Fetched",partyDTO);
@@ -144,21 +128,15 @@ public class PartyService {
     }
 
 
-    public ResponseEntity<ApiResponse<Object>> getAllParties(String userName, String firmName) {
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User not found",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ApiResponse<Object>> getAllParties() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
         if(!firmUtil.checkFirmExsist(user.getUserId())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!firm.getFirmName().equals(firmName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User are not authorised to this firm",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
         List<Party> allParties = partyRepository.findByFirmFirmId(firm.getFirmId());
         List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties);
         ApiResponse<Object> response = new ApiResponse<>(true,"List of parties under firm fetched",allPartyDTO);

@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item,Long> {
     Item findByItemNameAndPartyPartyName(String itemName,String partyName);
+
+    Item findByItemIdAndPartyPartyName(Long id,String partyName);
     List<Item> findByPartyPartyName(String partyName);
     List<Item> findByPartyPartyNameIn(List<String> partyName);
 }

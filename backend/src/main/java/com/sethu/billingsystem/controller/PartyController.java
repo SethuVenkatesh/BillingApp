@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,26 +23,26 @@ public class PartyController {
     @Autowired
     PartyService partyService;
     @PostMapping("/new")
-    @JsonView(PartyDTO.View.Internal.class)
-    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestParam String firmName, @RequestParam String userName, @RequestBody @JsonView(value = {PartyDTO.View.External.class}) @Valid PartyDTO requestBody){
-       return partyService.createParty(firmName,userName,requestBody);
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestBody @Validated(value = {PartyDTO.View.Create.class}) @JsonView(value = {PartyDTO.View.Create.class}) PartyDTO requestBody){
+       return partyService.createParty(requestBody);
     }
     @PatchMapping("/update")
-    @JsonView(PartyDTO.View.Internal.class)
-    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String userName, @RequestParam String firmName, @RequestParam String partyName, @RequestBody @JsonView(value = {PartyDTO.View.External.class}) @Valid PartyDTO requestBody){
-        return partyService.updateParty(userName,firmName,partyName,requestBody);
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String partyName, @RequestBody @Validated(value = {PartyDTO.View.Update.class}) @JsonView(value = {PartyDTO.View.Update.class}) PartyDTO requestBody){
+        return partyService.updateParty(partyName,requestBody);
     }
 
     @GetMapping("/details")
-    @JsonView(PartyDTO.View.Internal.class)
-    private ResponseEntity<ApiResponse<Object>> partyDetails(@RequestParam String userName, @RequestParam String firmName, @RequestParam String partyName){
-        return partyService.getPartyDetails(userName,firmName,partyName);
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> partyDetails(@RequestParam String partyName){
+        return partyService.getPartyDetails(partyName);
     }
 
     @GetMapping("/all")
-    @JsonView(PartyDTO.View.Internal.class)
-    private ResponseEntity<ApiResponse<Object>> getAllParties(@RequestParam String userName,@RequestParam String firmName){
-        return partyService.getAllParties(userName,firmName);
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> getAllParties(){
+        return partyService.getAllParties();
     }
 
 }

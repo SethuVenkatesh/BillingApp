@@ -22,8 +22,8 @@ public class Bank {
     private String branch;
     @Column(name = "IFSC_code")
     private String ifscCode;
-    @OneToOne(mappedBy = "bank")
-    private Firm firm;
-    @OneToOne(mappedBy = "bank")
-    private Party party;
+//    @OneToOne(mappedBy = "bank")
+//    private Firm firm;
+//    @OneToOne(mappedBy = "bank")
+//    private Party party;
 }

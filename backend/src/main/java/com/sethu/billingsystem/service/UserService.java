@@ -1,5 +1,9 @@
 package com.sethu.billingsystem.service;
 
+import com.sethu.billingsystem.config.BillingAuthenticationProvider;
+import com.sethu.billingsystem.config.BillingUserDetailService;
+import com.sethu.billingsystem.constants.ApplicationConstants;
+import com.sethu.billingsystem.dto.AuthRequest;
 import com.sethu.billingsystem.dto.UserDTO;
 import com.sethu.billingsystem.mapper.UserMapper;
 import com.sethu.billingsystem.model.ApiResponse;
@@ -7,20 +11,44 @@ import com.sethu.billingsystem.model.Customer;
 import com.sethu.billingsystem.repository.UserRepository;
 import com.sethu.billingsystem.utils.CommonUtil;
 import com.sethu.billingsystem.utils.UserUtil;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
 @Service
+@RequiredArgsConstructor
 public class UserService {
+
+    private final AuthenticationManager authenticationManager;
+    private final Environment env;
+
+
     Logger logger = LoggerFactory.getLogger(UserService.class);
     @Autowired
     UserRepository userRepository;
-
+    @Autowired
+    BillingAuthenticationProvider authProvider;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -29,11 +57,10 @@ public class UserService {
     UserUtil userUtil;
     @Autowired
     CommonUtil util;
-    public ResponseEntity<ApiResponse<Object>> getUserDetails(String userName) {
-        if(!userUtil.checkUserExsist(userName)){
-            ApiResponse<Object> response =new  ApiResponse<>(false,"User Name not found",null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ApiResponse<Object>> getUserDetails() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+
         Customer user = userRepository.findOneByUserName(userName);
         UserDTO userDetails = new UserDTO();
         userMapper.userToUserDTO(user,userDetails);
@@ -52,15 +79,81 @@ public class UserService {
             ApiResponse<Object> response =new ApiResponse<>(false,"User Name Already found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Customer user = new Customer();
-        userMapper.userDTOTOUser(requestBody,user);
-        String hashPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(hashPassword);
-        Customer savedUser = userRepository.save(user);
-        UserDTO userDTO = new UserDTO();
-        userMapper.userToUserDTO(savedUser,userDTO);
-        ApiResponse<Object> response =new  ApiResponse<>(true,"User is created",userDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        if(userUtil.checkEmailExsist(requestBody.getEmail())){
+            ApiResponse<Object> response =new ApiResponse<>(false,"Email Already found",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        try{
+            Customer user = new Customer();
+            userMapper.userDTOTOUser(requestBody,user);
+            String hashPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(hashPassword);
+            Customer savedUser = userRepository.save(user);
+            UserDTO userDTO = new UserDTO();
+            userMapper.userToUserDTO(savedUser,userDTO);
+            ApiResponse<Object> response =new  ApiResponse<>(true,"User is created",userDTO);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+        catch (Exception ex) {
+            ApiResponse<Object> response =new  ApiResponse<>(true,"User Creation Failed due to "+ex.getMessage(),null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body(response);
+        }
+    }
+
+    public ResponseEntity<ApiResponse<Object>> loginUser(AuthRequest auth) {
+        String jwt = "";
+        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(auth.getUserName(),
+                auth.getPassword());
+        Authentication authenticationResponse = authenticationManager.authenticate(authentication);
+        if(null != authenticationResponse && authenticationResponse.isAuthenticated()) {
+            if (null != env) {
+                String secret = env.getProperty(ApplicationConstants.JWT_SECRET,
+                        ApplicationConstants.JWT_DEFAULT_SECRET);
+                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                Object GrantedAuthority;
+                jwt = Jwts.builder().issuer("Billing System").subject("JWT Token")
+                        .claim("username",authenticationResponse.getPrincipal())
+                        .claim("authorities",authenticationResponse.getAuthorities().stream().map(org.springframework.security.core.GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                        .issuedAt(new Date(System.currentTimeMillis()))
+                        .expiration(new Date(System.currentTimeMillis() + ApplicationConstants.JWT_TOKEN_EXPIRATION))
+                        .signWith(secretKey).compact();
+            }
+        }
+        Map<String,String> loginDetails = new HashMap<>();
+        loginDetails.put("username",auth.getUserName());
+        loginDetails.put("looged in at ", String.valueOf(new Date(System.currentTimeMillis())));
+        ApiResponse<Object> response = new ApiResponse<>(true,"User Logged In Successfully",loginDetails);
+        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt).body(response);
+    }
+
+
+    public ResponseEntity<ApiResponse<Object>> updateUserDetails(UserDTO requestBody) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        logger.info("user {} ",requestBody);
+        boolean isAllNull = util.isNullAllFields(requestBody);
+        if(isAllNull){
+            ApiResponse<Object> response =new ApiResponse<>(false,"Empty Values are passed for user",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if(requestBody.getEmail()!=null && userUtil.checkEmailExsist(requestBody.getEmail())){
+            ApiResponse<Object> response =new ApiResponse<>(false,"Email Already found",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        try {
+            Customer user = userUtil.getUserDetails(userName);
+            userMapper.userDTOTOUser(requestBody,user);
+            Customer savedUser = userRepository.save(user);
+            UserDTO userDTO = new UserDTO();
+            userMapper.userToUserDTO(savedUser,userDTO);
+            ApiResponse<Object> response =new  ApiResponse<>(true,"User Updated Successfully",userDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }catch (Exception ex){
+            ApiResponse<Object> response =new  ApiResponse<>(true,ex.getMessage(),null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
 
     }
 }
