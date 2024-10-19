@@ -44,10 +44,12 @@ public class FirmService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firmCheck = firmUtil.getFirmDetails(user.getUserId());
+        if(firmCheck!=null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Already Have one firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         if(firmUtil.checkUniqueFirm(firmDTO.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Firm Name Already exist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -67,7 +69,7 @@ public class FirmService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
-        Firm firmDetails = firmRepository.findByUserUserId(user.getUserId());
+        Firm firmDetails = firmUtil.getFirmDetails(user.getUserId());
         if(firmDetails == null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Firm is found for the user",null);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -89,7 +91,8 @@ public class FirmService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have Firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -97,7 +100,6 @@ public class FirmService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Firm Name Already exist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmRepository.findByUserUserId(user.getUserId());
         firmMapper.firmDTOTOFirm(firmDTO,firm);
         Firm savedFirm = firmRepository.save(firm);
         FirmDTO firmDetails = new FirmDTO();

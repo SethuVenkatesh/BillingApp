@@ -24,6 +24,8 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoiceId;
+    @Column(name = "invoice_number")
+    private Long invoiceNumber;
     @ManyToOne
     @JoinColumn(name = "firm_id")
     private Firm firm;

@@ -49,7 +49,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/delete")
-    private ResponseEntity<ApiResponse<Object>> deleteItem(@RequestParam Long itemId,@RequestParam String partyName){
-        return itemService.deleteItem(itemId,partyName);
+    private ResponseEntity<ApiResponse<Object>> deleteItem(@RequestParam String itemName,@RequestParam String partyName){
+        return itemService.deleteItem(itemName,partyName);
     }
 }

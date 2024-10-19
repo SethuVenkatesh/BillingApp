@@ -8,8 +8,10 @@ import java.util.List;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice,Long> {
-    Invoice findByInvoiceIdAndFirmFirmId(Long invoiceId,Long firmId);
+    Invoice findByInvoiceNumberAndFirmFirmId(Long invoiceNumber,Long firmId);
 
-    List<Invoice> findByFirmFirmId(Long firmId);
+    List<Invoice> findByFirmFirmIdOrderByInvoiceDateDesc(Long firmId);
+
+    Long countByFirmFirmId(Long firmId);
 
 }

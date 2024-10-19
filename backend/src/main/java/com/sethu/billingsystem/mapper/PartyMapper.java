@@ -16,7 +16,6 @@ public interface PartyMapper {
     void partyToPartyDTO(Party party, @MappingTarget PartyDTO partyDTO);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void partyDTOTOParty(PartyDTO partyDTO,@MappingTarget Party party);
-
     List<PartyDTO> partyListToDTOList(List<Party> parties);
 
 }

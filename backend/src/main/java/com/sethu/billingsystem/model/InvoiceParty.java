@@ -27,9 +27,6 @@ public class InvoiceParty {
     @Column(name = "alt_mobile_number")
     private String altMobileNumber;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "bank_id")
-    private Bank bank;
-    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
     @Column(name = "created_at")

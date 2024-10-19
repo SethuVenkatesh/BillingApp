@@ -45,4 +45,10 @@ public class PartyController {
         return partyService.getAllParties();
     }
 
+    @DeleteMapping ("delete")
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> deleteParty(@RequestParam String partyName){
+        return partyService.deleteParty(partyName);
+    }
+
 }

@@ -10,6 +10,8 @@ public class BankDTO {
     public interface View {
         interface External {}
         interface Internal extends External {}
+
+
     }
     @JsonView(value = {View.Internal.class})
     private Long bankId;

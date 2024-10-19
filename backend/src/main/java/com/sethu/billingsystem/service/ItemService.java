@@ -48,16 +48,16 @@ public class ItemService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
         if(itemUtil.checkItemExsist(requestBody.getItemName(),partyName)){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Item Name already found for party",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,12 +80,13 @@ public class ItemService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Don't have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -94,11 +95,11 @@ public class ItemService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Item Name already found for party",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(!itemUtil.checkItemExsist(itemName,partyName)){
+        Item item = itemRepository.findByItemNameAndPartyPartyName(itemName,partyName);
+        if(item==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Item Name Not Found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Item item = itemRepository.findByItemNameAndPartyPartyName(itemName,partyName);
         itemMapper.itemDTOTOItem(requestBody,item);
         Item savedItem = itemRepository.save(item);
         ItemDTO updatedItem = new ItemDTO();
@@ -112,11 +113,11 @@ public class ItemService {
         String userName = auth.getName();
 
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
         List<Party> parties = partyRepository.findByFirmFirmId(firm.getFirmId());
         List<String> allParties = parties.stream().map(Party::getPartyName).toList();
         List<Item> allItems = itemRepository.findByPartyPartyNameIn(allParties);
@@ -129,12 +130,14 @@ public class ItemService {
         String userName = auth.getName();
 
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -145,28 +148,28 @@ public class ItemService {
 
     }
 
-    public ResponseEntity<ApiResponse<Object>> deleteItem(Long itemId,String partyName) {
+    public ResponseEntity<ApiResponse<Object>> deleteItem(String itemName,String partyName) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
 
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        if(!itemUtil.checkItemExsistById(Long.valueOf(itemId),partyName)){
+        Item item = itemUtil.getItemByItemName(itemName,partyName);
+        if(item==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Item Name Not Found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        itemRepository.deleteById(Long.valueOf(itemId));
-        ApiResponse<Object> response = new ApiResponse<>(true,"Item Deleted Successfully",itemId);
+        itemRepository.deleteById(item.getItemId());
+        ApiResponse<Object> response = new ApiResponse<>(true,"Item Deleted Successfully",null);
         return new ResponseEntity<>(response,HttpStatus.OK);
 
     }

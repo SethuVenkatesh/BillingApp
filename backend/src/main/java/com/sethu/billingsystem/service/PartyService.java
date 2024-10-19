@@ -57,11 +57,11 @@ public class PartyService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
         if(partyUtil.checkPartyExsist(requestBody.getPartyName(), firm.getFirmName())){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -85,12 +85,14 @@ public class PartyService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -98,7 +100,6 @@ public class PartyService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
         partyMapper.partyDTOTOParty(requestBody,party);
         Party updatedParty = partyRepository.save(party);
         PartyDTO partyDTO = new PartyDTO();
@@ -111,16 +112,16 @@ public class PartyService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
-        if(!partyUtil.checkPartyExsist(partyName, firm.getFirmName())){
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
         PartyDTO partyDTO= new PartyDTO();
         partyMapper.partyToPartyDTO(party,partyDTO);
         ApiResponse<Object> response =new  ApiResponse<>(true,"Firm Details Fetched",partyDTO);
@@ -132,15 +133,34 @@ public class PartyService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
-        if(!firmUtil.checkFirmExsist(user.getUserId())){
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Firm firm = firmUtil.getFirmDetails(user.getUserId());
         List<Party> allParties = partyRepository.findByFirmFirmId(firm.getFirmId());
         List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties);
         ApiResponse<Object> response = new ApiResponse<>(true,"List of parties under firm fetched",allPartyDTO);
         return new ResponseEntity<>(response,HttpStatus.OK);
 
+    }
+
+    public ResponseEntity<ApiResponse<Object>> deleteParty(String partyName) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        Customer user = userUtil.getUserDetails(userName);
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
+            ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Party party = partyUtil.getPartyDetails(partyName,firm.getFirmName());
+        if(party==null){
+            ApiResponse<Object> response =new  ApiResponse<>(false,"Party Not found",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        partyRepository.deleteById(party.getPartyId());
+        ApiResponse<Object> response = new ApiResponse<>(true,"Party Deleted successfully",null);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
