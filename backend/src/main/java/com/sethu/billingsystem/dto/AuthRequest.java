@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 public class AuthRequest {
-    @Size(min = 5, max = 25,message = "User Name must be 5 and 25 characters")
     @NotBlank(message = "Username cannot be blank")
+    @Size(min = 5, max = 25,message = "Username must between 5 to 25 characters")
     private String userName;
     @NotBlank(message = "Password cannot be blank")
     private String password;

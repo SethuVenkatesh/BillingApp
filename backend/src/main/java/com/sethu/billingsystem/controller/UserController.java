@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/api/users",method = RequestMethod.POST)
 @Validated
 public class UserController {

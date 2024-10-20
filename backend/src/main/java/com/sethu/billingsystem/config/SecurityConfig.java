@@ -35,6 +35,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -47,10 +48,10 @@ public class SecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
-                        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization"));
+                        corsConfiguration.setExposedHeaders(List.of("Authorization"));
                         corsConfiguration.setMaxAge(3600L);
                         return corsConfiguration;
                     }
@@ -60,14 +61,13 @@ public class SecurityConfig {
 //                                .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler).
 //                                csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .csrf(AbstractHttpConfigurer::disable)
-//                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenGenertionFilter(),BasicAuthenticationFilter.class)
                 .addFilterBefore(new JwtTokenValidationFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests ->
                 requests.requestMatchers("/api/users/auth/new","api/users/auth/login").permitAll()
                         .requestMatchers("/api/**").authenticated()
         );
-        http.formLogin(Customizer.withDefaults());
+//        http.formLogin(Customizer.withDefaults());
         http.httpBasic(httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return (SecurityFilterChain)http.build();

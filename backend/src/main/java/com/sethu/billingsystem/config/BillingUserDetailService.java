@@ -21,7 +21,7 @@ public class BillingUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
        Customer user = userRepository.findByUserName(username).orElseThrow(()->
-               new UsernameNotFoundException("UserName Not found "+ username));
+               new UsernameNotFoundException("UserName Not found"));
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole()));
         return new User(user.getUserName(),user.getPassword(),authorities);
     }

@@ -15,8 +15,7 @@ public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryP
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String message = (authException != null && authException.getMessage() != null) ? authException.getMessage()
                 : "Unauthorized";
-        response.setHeader("error-reason", "Authentication failed");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setHeader("error-reason", "Authentication failed");response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json;charset=UTF-8");
 
         // Construct the JSON response

@@ -120,10 +120,13 @@ public class UserService {
                         .signWith(secretKey).compact();
             }
         }
-        Map<String,String> loginDetails = new HashMap<>();
-        loginDetails.put("username",auth.getUserName());
-        loginDetails.put("looged in at ", String.valueOf(new Date(System.currentTimeMillis())));
-        ApiResponse<Object> response = new ApiResponse<>(true,"User Logged In Successfully",loginDetails);
+//        Map<String,String> loginDetails = new HashMap<>();
+//        loginDetails.put("username",auth.getUserName());
+        Customer user=userUtil.getUserDetails(auth.getUserName());
+        UserDTO userDTO = new UserDTO();
+        userMapper.userToUserDTO(user,userDTO);
+//        loginDetails.put("looged in at ", String.valueOf(new Date(System.currentTimeMillis())));
+        ApiResponse<Object> response = new ApiResponse<>(true,"User Logged In Successfully",userDTO);
         return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt).body(response);
     }
 
