@@ -21,8 +21,12 @@ public class Customer {
     private String password;
     @Column(name = "email_id",unique = true)
     private String email;
+    @Column(name = "mobile_number")
+    private String mobileNumber;
     @Column(name = "profile_url")
     private String profileUrl;
+    @Column(name = "cloudinary_folder")
+    private String cloudinaryFolder;
     @Column(name = "role")
     private String role="user";
     @Column(name = "created_at")

@@ -4,20 +4,22 @@ import { BrowserRouter as Router,Routes, Route, Redirect } from 'react-router-do
 import LoginPage from './pages/authentication/LoginPage';
 import SignUpPage from './pages/authentication/SignUpPage';
 import NotFound from './pages/NotFound';
-// import ProtectiveRoute from './context/ProtectiveRoute';
+import Dashboard from './pages/dashboard/Dashboard';
+import ProtectiveRoute from './context/ProtectiveRoute';
 
 function App() {
   return (
       <div className=''>
         <Router>
           <Routes>
-            {/* <Route 
+            <Route 
               path='/dashboard/*' 
               element={
               <ProtectiveRoute>
                 <Dashboard/>
-              </ProtectiveRoute>}  
-            /> */}
+              </ProtectiveRoute>
+            }  
+            />
             <Route exact path='/' element={<LoginPage/>}></Route>
             <Route exact path='/signup' element={<SignUpPage/>}></Route>
             <Route exact path='/login' element={<LoginPage/>}></Route>

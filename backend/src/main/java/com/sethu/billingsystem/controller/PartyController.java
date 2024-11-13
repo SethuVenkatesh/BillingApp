@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class PartyController {
     PartyService partyService;
     @PostMapping("/new")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestBody @Validated(value = {PartyDTO.View.Create.class}) @JsonView(value = {PartyDTO.View.Create.class}) PartyDTO requestBody){
-       return partyService.createParty(requestBody);
+    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Create.class}) @JsonView(value = {PartyDTO.View.Create.class}) PartyDTO requestBody,@RequestPart("partyImage") MultipartFile partyImage){
+       return partyService.createParty(requestBody,partyImage);
     }
     @PatchMapping("/update")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String partyName, @RequestBody @Validated(value = {PartyDTO.View.Update.class}) @JsonView(value = {PartyDTO.View.Update.class}) PartyDTO requestBody){
-        return partyService.updateParty(partyName,requestBody);
+    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String partyName, @RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Update.class}) @JsonView(value = {PartyDTO.View.Update.class}) PartyDTO requestBody, @RequestPart("partyImage") MultipartFile image){
+        return partyService.updateParty(partyName,requestBody,image);
     }
 
     @GetMapping("/details")

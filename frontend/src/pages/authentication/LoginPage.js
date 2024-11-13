@@ -267,6 +267,7 @@ const LoginPage = () => {
             setSuccesNotification(true);
             setToastMsg(response.data.message);
             setLoading(false);
+            navigate("/dashboard/home");
         }
     }catch(err){
         console.log(err);

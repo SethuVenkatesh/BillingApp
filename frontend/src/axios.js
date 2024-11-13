@@ -5,8 +5,10 @@ export const UnAuthorizedApi = axios.create({
 })
 export const AuthorizedApi = axios.create({
     baseURL:'http://localhost:8081/api',
-    headers:{
-        "Authorization":sessionStorage.getItem("techprinting-auth-token")
-    }
 })
 
+AuthorizedApi.interceptors.request.use(function (config){
+    const token = sessionStorage.getItem("techprinting-auth-token");
+    config.headers.Authorization = token;
+    return config;
+})

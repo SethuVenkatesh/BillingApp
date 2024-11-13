@@ -3,10 +3,11 @@ package com.sethu.billingsystem.dto;
 import com.fasterxml.jackson.annotation.JsonView;
 
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Data
 public class UserDTO {
@@ -16,19 +17,22 @@ public class UserDTO {
         interface  Update {}
     }
     @JsonView(value = {UserDTO.View.Details.class})
-    @NotBlank(groups = {UserDTO.View.Details.class},message = "User Name cannot be blank")
-    @Size(groups = {UserDTO.View.Details.class},min = 5, max = 25,message = "User Name must be 5 and 25 characters")
+    @NotBlank(groups = {UserDTO.View.Create.class},message = "User Name cannot be blank")
+    @Size(groups = {UserDTO.View.Create.class,UserDTO.View.Update.class},min = 5, max = 25,message = "User Name must be 5 to 25 characters")
     private String userName;
     @JsonView(value = {UserDTO.View.Create.class})
     @NotBlank(groups = {UserDTO.View.Create.class},message = "Password cannot be blank")
-    @Size(groups = {UserDTO.View.Create.class},min = 5, max = 25,message = "Password must be 5 and 25 characters")
+    @Size(groups = {UserDTO.View.Create.class},min = 5, max = 25,message = "Password must be 5 to 25 characters")
     private String password;
+    @JsonView(value = {UserDTO.View.Details.class})
+    @NotBlank(groups = {UserDTO.View.Create.class},message = "Mobile Number cannot be blank")
+    @Pattern(groups = {UserDTO.View.Create.class,UserDTO.View.Update.class},regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+    private String mobileNumber;
     @JsonView(value = {UserDTO.View.Details.class,UserDTO.View.Update.class})
-    @NotBlank(groups = {UserDTO.View.Details.class},message = "Email cannot be blank")
-    @Email(groups = {UserDTO.View.Update.class,UserDTO.View.Details.class},message = "Email Id is invalid")
+    @NotBlank(groups = {UserDTO.View.Create.class},message = "Email cannot be blank")
+    @Email(groups = {UserDTO.View.Update.class,UserDTO.View.Create.class},message = "Email Id is invalid")
     private String email;
-    @JsonView(value = {UserDTO.View.Details.class,UserDTO.View.Update.class})
-    @NotBlank(groups = {UserDTO.View.Details.class},message = "Profile Url cannot be blank")
+    @JsonView(value = {UserDTO.View.Details.class})
     private String profileUrl;
 }
 

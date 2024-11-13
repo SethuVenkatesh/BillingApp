@@ -1,7 +1,6 @@
 package com.sethu.billingsystem.service;
 
 import com.sethu.billingsystem.config.BillingAuthenticationProvider;
-import com.sethu.billingsystem.config.BillingUserDetailService;
 import com.sethu.billingsystem.constants.ApplicationConstants;
 import com.sethu.billingsystem.dto.AuthRequest;
 import com.sethu.billingsystem.dto.UserDTO;
@@ -23,16 +22,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -51,6 +48,9 @@ public class UserService {
     BillingAuthenticationProvider authProvider;
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ImageUpload imageService;
     @Autowired
     UserMapper userMapper;
     @Autowired
@@ -68,7 +68,7 @@ public class UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
-    public ResponseEntity<ApiResponse<Object>> createUser(UserDTO requestBody) {
+    public ResponseEntity<ApiResponse<Object>> createUser(UserDTO requestBody, MultipartFile userImage) {
         logger.info("user {} ",requestBody);
         boolean isAllNull = util.isNullAllFields(requestBody);
         if(isAllNull){
@@ -88,14 +88,18 @@ public class UserService {
             userMapper.userDTOTOUser(requestBody,user);
             String hashPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(hashPassword);
+            String cloudinaryFolder = util.generateCloudinaryFolder();
+            user.setCloudinaryFolder(cloudinaryFolder);
+            String imageUrl = imageService.uploadImage(userImage,cloudinaryFolder);
+            user.setProfileUrl(imageUrl);
             Customer savedUser = userRepository.save(user);
             UserDTO userDTO = new UserDTO();
             userMapper.userToUserDTO(savedUser,userDTO);
-            ApiResponse<Object> response =new  ApiResponse<>(true,"User is created",userDTO);
+            ApiResponse<Object> response =new  ApiResponse<>(true,"User is created successfully",userDTO);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
         catch (Exception ex) {
-            ApiResponse<Object> response =new  ApiResponse<>(true,"User Creation Failed due to "+ex.getMessage(),null);
+            ApiResponse<Object> response =new ApiResponse<>(true,"User Creation Failed due to "+ex.getMessage(),null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
                     body(response);
         }
@@ -120,12 +124,10 @@ public class UserService {
                         .signWith(secretKey).compact();
             }
         }
-//        Map<String,String> loginDetails = new HashMap<>();
-//        loginDetails.put("username",auth.getUserName());
+
         Customer user=userUtil.getUserDetails(auth.getUserName());
         UserDTO userDTO = new UserDTO();
         userMapper.userToUserDTO(user,userDTO);
-//        loginDetails.put("looged in at ", String.valueOf(new Date(System.currentTimeMillis())));
         ApiResponse<Object> response = new ApiResponse<>(true,"User Logged In Successfully",userDTO);
         return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt).body(response);
     }

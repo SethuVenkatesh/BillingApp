@@ -48,7 +48,7 @@ public class SecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setExposedHeaders(List.of("Authorization"));
@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .addFilterAfter(new JwtTokenGenertionFilter(),BasicAuthenticationFilter.class)
                 .addFilterBefore(new JwtTokenValidationFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests ->
-                requests.requestMatchers("/api/users/auth/new","api/users/auth/login").permitAll()
+                requests.requestMatchers("/api/users/auth/new","/api/users/auth/login").permitAll()
                         .requestMatchers("/api/**").authenticated()
         );
 //        http.formLogin(Customizer.withDefaults());

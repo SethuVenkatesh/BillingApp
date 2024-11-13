@@ -1,6 +1,5 @@
 package com.sethu.billingsystem.service;
 
-import com.sethu.billingsystem.controller.FirmController;
 import com.sethu.billingsystem.dto.PartyDTO;
 import com.sethu.billingsystem.mapper.PartyMapper;
 import com.sethu.billingsystem.model.ApiResponse;
@@ -22,10 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class PartyService {
@@ -39,6 +37,9 @@ public class PartyService {
     PartyRepository partyRepository;
     @Autowired
     PartyMapper partyMapper;
+
+    @Autowired
+    ImageUpload imageService;
     @Autowired
     CommonUtil util;
     @Autowired
@@ -47,7 +48,7 @@ public class PartyService {
     FirmUtil firmUtil;
     @Autowired
     PartyUtil partyUtil;
-    public ResponseEntity<ApiResponse<Object>> createParty(PartyDTO requestBody) {
+    public ResponseEntity<ApiResponse<Object>> createParty(PartyDTO requestBody, MultipartFile partyImage) {
         boolean isAllNull = util.isNullAllFields(requestBody);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
@@ -66,16 +67,27 @@ public class PartyService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Party party = new Party();
-        partyMapper.partyDTOTOParty(requestBody,party);
-        party.setFirm(firm);
-        Party savedParty = partyRepository.save(party);
-        PartyDTO partyDTO = new PartyDTO();
-        partyMapper.partyToPartyDTO(savedParty,partyDTO);
-        ApiResponse<Object> response =new  ApiResponse<>(true,"Firm is Created",partyDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try{
+            Party party = new Party();
+            partyMapper.partyDTOTOParty(requestBody,party);
+            party.setFirm(firm);
+            if(partyImage != null){
+                String logoUrl = imageService.uploadImage(partyImage, user.getCloudinaryFolder()+"/party");
+                party.setLogoUrl(logoUrl);
+            }
+            Party savedParty = partyRepository.save(party);
+            PartyDTO partyDTO = new PartyDTO();
+            partyMapper.partyToPartyDTO(savedParty,partyDTO);
+            ApiResponse<Object> response =new  ApiResponse<>(true,"Firm is Created",partyDTO);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (Exception e){
+            logger.info("Exception : {}",e);
+            ApiResponse<Object> response =new  ApiResponse<>(false,"Error in uploading image",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
-    public ResponseEntity<ApiResponse<Object>> updateParty(String partyName, PartyDTO requestBody) {
+    public ResponseEntity<ApiResponse<Object>> updateParty(String partyName, PartyDTO requestBody, MultipartFile partyImage) {
         boolean isAllNull = util.isNullAllFields(requestBody);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
@@ -100,12 +112,22 @@ public class PartyService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"Party Name already exsist",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        partyMapper.partyDTOTOParty(requestBody,party);
-        Party updatedParty = partyRepository.save(party);
-        PartyDTO partyDTO = new PartyDTO();
-        partyMapper.partyToPartyDTO(updatedParty,partyDTO);
-        ApiResponse<Object> response =new  ApiResponse<>(true,"Firm Details updated",partyDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try{
+            if(partyImage != null){
+                String logoUrl = imageService.uploadImage(partyImage, user.getCloudinaryFolder()+"/party");
+                party.setLogoUrl(logoUrl);
+            }
+            partyMapper.partyDTOTOParty(requestBody,party);
+            Party updatedParty = partyRepository.save(party);
+            PartyDTO partyDTO = new PartyDTO();
+            partyMapper.partyToPartyDTO(updatedParty,partyDTO);
+            ApiResponse<Object> response =new  ApiResponse<>(true,"Firm Details updated",partyDTO);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch(Exception e){
+            logger.info("Exception : {} ", e);
+            ApiResponse<Object> response =new  ApiResponse<>(false,"Error in uploading image",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public ResponseEntity<ApiResponse<Object>> getPartyDetails(String partyName) {

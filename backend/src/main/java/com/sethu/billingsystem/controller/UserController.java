@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -35,9 +36,9 @@ public class UserController {
     CommonUtil util;
     @PostMapping("/auth/new")
     @JsonView(UserDTO.View.Details.class)
-    public ResponseEntity<ApiResponse<Object>> createUser(@RequestBody @Validated(value = {UserDTO.View.Create.class}) @JsonView(value = {UserDTO.View.Create.class}) UserDTO requestBody){
+    public ResponseEntity<ApiResponse<Object>> createUser(@RequestPart("userDetails") @Validated(value = {UserDTO.View.Create.class}) @JsonView(value = {UserDTO.View.Create.class}) UserDTO requestBody, @RequestPart("userImage")MultipartFile userImage){
         logger.info("Request Body {}",requestBody);
-        return userService.createUser(requestBody);
+        return userService.createUser(requestBody,userImage);
     }
     @GetMapping("/details")
     @JsonView(UserDTO.View.Details.class)

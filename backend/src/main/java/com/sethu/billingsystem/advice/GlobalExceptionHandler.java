@@ -10,6 +10,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +30,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResponse<Object>> handleMissingParams(MissingServletRequestParameterException ex) {
         String name = ex.getParameterName();
+        log.error(name + " parameter is missing");
+        String errorMessage = name + " parameter is missing";
+        ApiResponse response = new ApiResponse(false,errorMessage,null);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMissingParamsPart(MissingServletRequestPartException ex) {
+        String name = ex.getRequestPartName();
         log.error(name + " parameter is missing");
         String errorMessage = name + " parameter is missing";
         ApiResponse response = new ApiResponse(false,errorMessage,null);

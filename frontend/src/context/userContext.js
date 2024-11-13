@@ -1,20 +1,18 @@
 import React, { createContext, useEffect, useState,useCallback } from 'react';
 import { UnAuthorizedApi,AuthorizedApi } from '../axios';
+import { useNavigate } from 'react-router-dom';
 
 export const UserDetailsContext = createContext();
 
 export function UserDetailsProvider({ children }) {
 
-
   const [userDetails, setUserDetails] = useState(JSON.parse(localStorage.getItem('techprinting-current-user'))||null);
   const [authToken,setAuthToken] = useState(sessionStorage.getItem("techprinting-auth-token")||null);
   const [firmDetails,setFirmDetails] = useState();
-  
   const userLogin = useCallback(async (inputs) => {
     console.log("User Login Api call");
     const res = await UnAuthorizedApi.post("/users/auth/login",inputs);
     if(res.status === 200){
-      console.log("user Login Callback ");
       let authKey = res.headers.getAuthorization();
       console.log("authKey",authKey);
       sessionStorage.setItem("techprinting-auth-token",authKey);
@@ -26,27 +24,33 @@ export function UserDetailsProvider({ children }) {
   }, []);
 
   const userLogout = useCallback(async () => {
-    console.log("user Logout Api call");
     sessionStorage.removeItem("techprinting-auth-token");
     localStorage.removeItem("techprinting-current-user");
     setUserDetails(null);
+    setFirmDetails(null);   
     setAuthToken(null);
   }, []);
 
 
    const getFirmDetails = () =>{
     AuthorizedApi.get('/firms/details').then((res)=>{
-      setFirmDetails(res.data)
-    }).catch(err=>console.log(err))
+      setFirmDetails(res.data.data)
+    }).catch((err)=>{
+      if(err.response.status == '401')
+        userLogout();
+    })
    }
 
 
    useEffect(() => {
+    console.log("auth Token",authToken)
      if (authToken) {
        getFirmDetails();
     } else {
       localStorage.removeItem("techprinting-current-user");
+      sessionStorage.removeItem("techprinting-auth-token");
       setFirmDetails(null);
+      setUserDetails((null));
     }
   }, [authToken]);
 
