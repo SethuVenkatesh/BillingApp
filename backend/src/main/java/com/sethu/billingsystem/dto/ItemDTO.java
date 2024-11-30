@@ -2,10 +2,10 @@ package com.sethu.billingsystem.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class ItemDTO {
@@ -21,9 +21,11 @@ public class ItemDTO {
     @NotBlank(groups = {ItemDTO.View.Create.class},message = "Item Name Cannot Be Blank")
     @JsonView(value = {ItemDTO.View.External.class})
     private String itemName;
-    @Min(groups = {ItemDTO.View.Create.class,ItemDTO.View.Update.class},value = 1,message = "price must be greater then 0")
+    @DecimalMin(groups = {ItemDTO.View.Create.class,ItemDTO.View.Update.class},value = "1.00",message = "price must be greater than 1.00")
+    @DecimalMax(groups = {ItemDTO.View.Create.class,ItemDTO.View.Update.class},value = "999999.99",message = "price must be lesser than 999999.99")
+    @Digits(integer = 6,fraction = 2,message = "price must be number with 8 digits and maximum of 2 decimal points ")
     @JsonView(value = {ItemDTO.View.External.class})
-    private Long price;
+    private BigDecimal price;
     @JsonView(value = {ItemDTO.View.External.class})
     private PartyDTO party;
 

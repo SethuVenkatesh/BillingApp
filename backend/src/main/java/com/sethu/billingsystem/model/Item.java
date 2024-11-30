@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,8 +18,8 @@ public class Item {
     private Long itemId;
     @Column(name = "item_name")
     private String itemName;
-    @Column(name = "price")
-    private Long price;
+    @Column(name = "price",precision = 8,scale = 2)
+    private BigDecimal price;
     @ManyToOne
     private Party party;
     @Column(name = "created_at")

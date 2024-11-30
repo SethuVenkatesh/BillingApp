@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        'authimg': "url('../src/assets/loginImage.png')",
+        'authimg': "url('../src/assets/loginBgImage.jpg')",
         'companyLogo': "url('../src/assets/appLogo.png)"
       },
       flex: {

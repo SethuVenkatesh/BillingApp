@@ -13,5 +13,4 @@ public interface InvoiceRepository extends JpaRepository<Invoice,Long> {
     List<Invoice> findByFirmFirmIdOrderByInvoiceDateDesc(Long firmId);
 
     Long countByFirmFirmId(Long firmId);
-
 }

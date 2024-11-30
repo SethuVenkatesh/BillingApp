@@ -8,173 +8,185 @@ import Loader from '../../components/common/Loader'
 import Toaster from '../../components/common/Toaster'
 import SelectComponent from '../../components/common/SelectComponent'
 import AutoComplete from '../../components/common/AutoComplete'
+import { billingItemValidation, invoiceValidation } from '../../utils/CommonUtils'
 
 const PaymentIn = () => {
 
     let today = new Date();
     let maxDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
-  const [paymentInDetails,setPatymentInDetails]  = useState({
-    items:[],
-    subTotal:"",
-    totalPrice:"",
-    SGSTPrice:"",
-    CGSTPrice:"",
-    SGSTPer :"",
-    CGSTPer :"",
-    includeGST:false,
+    const [paymentInDetails,setPatymentInDetails]  = useState({
+    invoiceItems:[],
+    subtotalPrice:0,
+    totalPrice:0,
+    cgstPrice:0,
+    sgstPrice:0,
+    sgstPer :0,
+    cgstPer :0,
+    includeGst:false,
     invoiceDate:maxDate
   })
-  const [addedItems,setAddedItems] = useState([{item_name:"Item 1",price:"1",quantity:"1"}])
+  const [addedItems,setAddedItems] = useState([{itemName:"Item 1",price:10,quantity:1}])
   const [toastMsg,setToastMsg] =useState("");
   const [toastStatus,setToastStatus] = useState(false);
   const [showGST,setShowGST] = useState(false);
   const [GSTDetails,setGSTDetails] = useState({
-    CGST:2.5,
-    SGST:2.5
+    CGST:2.50,
+    SGST:2.50
   })
   const [companyDetails,setCompanyDetails] = useState({
-    party_name:"",
-    email_id:"",
-    address:"",
-    city:"",
-    state:"",
-    pincode:"",
-    GST_number:"",
-    mobile_number:"",
-    alt_mobile_number:""
+    partyName:"",
+    email:"",
+    gstNumber:"",
+    mobileNumber:"",
+    altMobileNumber:"",
+    address:{
+        address:"",
+        city:"",
+        pincode:"",
+        state:""
+    }
   });
-
-  const [partyId,setPartyId] = useState("");  
   const [partyName,setPartyName] = useState("");
+  const [partySearchQuery,setPartySearchQuery] = useState("")
   const [loading,setLoading] = useState(false);
   const [allPartyItems,setAllPartyItems] = useState([])
   const {firmDetails} = useContext(UserDetailsContext)
 
   const onChangeParty = (res) =>{
-    console.log("onChnage Party",res)
-    setPartyName(res)
+    setPartySearchQuery(res);
+    setPartyName(res);
   }
   
 
   const addNewItems = () =>{
-        setAddedItems([...addedItems,{item_name:"Item "+(addedItems.length+1),price:"1",quantity:"1"}])
+        billingItemValidation.validate(addedItems,{abortEarly:false}).then((valid)=>{
+            setAddedItems([...addedItems,{itemName:"Item "+(addedItems.length+1),price:10,quantity:1}])
+        }).catch(error=>{
+            setToastMsg(error.inner[0]?.message);
+            setToastStatus(false); 
+        })
     }
 
     const calculateBill = () =>{
-        let lastItem = addedItems[addedItems.length-1];
-        console.log(lastItem)
-        if(lastItem.item_name.trim() == ""){
-            setToastMsg("Item Name cannot be empty");
-            setToastStatus(false);
-            return;
-        }
-        if(lastItem.price.toString().trim() == ""){
-            setToastMsg("Price Cannot be empty");
-            setToastStatus(false);
-            return;
-        }
-        if(lastItem.quantity.trim() == ""){
-            setToastMsg("Quantity Cannot be empty");
-            setToastStatus(false);
-            return;
-        }
-        let totalPrice = 0;
-        addedItems.map(item=>{
-            totalPrice  = totalPrice + (item.price * item.quantity)
-        })
-        let GSTPrice = totalPrice;
-        let SGSTPrice = 0;
-        let CGSTPrice = 0;
-        let SGSTPer = 0;
-        let CGSTPer = 0;
-        let includeGST = showGST;
-        if(showGST){
-            CGSTPrice = totalPrice * GSTDetails.CGST /100;
-            SGSTPrice = totalPrice * GSTDetails.SGST /100;
-            GSTPrice = totalPrice + SGSTPrice + CGSTPrice;
-            GSTPrice = GSTPrice.toFixed(3)
-            SGSTPer = GSTDetails.SGST;
-            CGSTPer = GSTDetails.CGST;
-        }
-        setPatymentInDetails({...paymentInDetails,subTotal:totalPrice,items:addedItems,totalPrice: GSTPrice,CGSTPrice:CGSTPrice,SGSTPrice:SGSTPrice,CGSTPer:CGSTPer,SGSTPer:SGSTPer,includeGST:includeGST})
-        
+        console.log("addedItems",addedItems)
+        billingItemValidation.validate(addedItems,{abortEarly:false}).then((valid)=>{
+            let totalPrice = 0;
+            addedItems.map(item=>{
+                totalPrice  = totalPrice + (item.price * item.quantity)
+            })
+            let GSTPrice = totalPrice; 
+            let SGSTPrice = 0;
+            let CGSTPrice = 0;
+            let SGSTPer = 0;
+            let CGSTPer = 0;
+            let includeGST = showGST;
+            if(showGST){
+                CGSTPrice = totalPrice * GSTDetails.CGST /100;
+                SGSTPrice = totalPrice * GSTDetails.SGST /100;
+                GSTPrice = totalPrice + SGSTPrice + CGSTPrice;
+                CGSTPrice = parseFloat(CGSTPrice).toFixed(2);
+                SGSTPrice = parseFloat(SGSTPrice).toFixed(2);
+                GSTPrice = parseFloat(GSTPrice).toFixed(2);
+                SGSTPer = parseFloat(GSTDetails.SGST).toFixed(2);
+                CGSTPer = parseFloat(GSTDetails.CGST).toFixed(2);
+                CGSTPrice = parseFloat(CGSTPrice).toFixed(2);
+                totalPrice = parseFloat(totalPrice).toFixed(2);
+            }else{
+                GSTPrice = parseFloat(GSTPrice).toFixed(2);
+            }
+            
+            setPatymentInDetails({...paymentInDetails,subtotalPrice:totalPrice,invoiceItems:addedItems,totalPrice: GSTPrice,cgstPrice:CGSTPrice,sgstPrice:SGSTPrice,cgstPer:CGSTPer,sgstPer:SGSTPer,includeGst:includeGST})
+        }).catch(error=>{
+            setLoading(false);
+            setToastMsg(error.inner[0]?.message);
+            setToastStatus(false);  
+        })        
     }
     const handleCheckOut = () =>{
-
-        if(paymentInDetails.items.length == 0){
-            setToastStatus(false);
-            setToastMsg("Calculate the Bill and then Checkout")
-             return;
-        }
         let invoiceData = {
-            payment_details:paymentInDetails,
-            party:{...companyDetails,party_name:partyName},
-            firm:firmDetails._id
+            ...paymentInDetails,
+            invoiceParty:{...companyDetails,partyName:partyName},
+        }
+        console.log(invoiceData)
+        if(invoiceData.invoiceItems.length == 0){
+            setToastMsg("Calculate the Bill and then proceed to checkout");
+            setToastStatus(false);
+            return;
         }
         setLoading(true);
-        AuthorizedApi.post("/sales/new_invoice",{invoiceData}).then((res)=>{
-            setToastStatus(true);
-            setToastMsg("Invoice Added Successfully");
-            setPartyName("")
-            setCompanyDetails({  
-            party_name:"",
-            email_id:"",
-            address:"",
-            city:"",
-            state:"",
-            pincode:"",
-            GST_number:"",
-            mobile_number:"",
-            alt_mobile_number:""
+        invoiceValidation.validate(invoiceData,{abortEarly:false}).then((valid)=>{
+            AuthorizedApi.post("/invoice/new",{...invoiceData}).then((res)=>{
+                setToastStatus(true);
+                setToastMsg(res.data.message);
+                setPartyName("")
+                setCompanyDetails({  
+                    partyName:"",
+                    email:"",
+                    gstNumber:"",
+                    mobileNumber:"",
+                    altMobileNumber:"",
+                    address:{
+                        address:"",
+                        city:"",
+                        pincode:"",
+                        state:""
+                    }
+                })
+                setPatymentInDetails({
+                    invoiceItems:[],
+                    subtotalPrice:0,
+                    totalPrice:0,
+                    cgstPrice:0,
+                    sgstPrice:0,
+                    sgstPer :0,
+                    cgstPer :0,
+                    includeGst:false,
+                    invoiceDate:maxDate
+                })
+                setAddedItems([{itemName:"Item 1",price:10,quantity:1}])
+                setLoading(false);
+            }).catch(err=>{
+                console.log(err)
+                setLoading(false);
+                setToastStatus(false);
+                setToastMsg(err.response.data.message)
             })
-            setPatymentInDetails({
-                items:[],
-                subTotal:"",
-                totalPrice:"",
-                SGSTPrice:"",
-                CGSTPrice:"",
-                SGSTPer :"",
-                CGSTPer :"",
-                includeGST:false,
-                invoiceDate:maxDate
-            })
-
-            setAddedItems([{item_name:"Item 1",price:"1",quantity:"1"}])
+            console.log("invoiceData",invoiceData)
+        }).catch((error)=>{
             setLoading(false);
-        }).catch(err=>{
-            console.log(err)
-            setLoading(false);
-            setToastStatus(false);
-            setToastMsg(err.message)
+            setToastMsg(error.inner[0]?.message);
+            setToastStatus(false); 
         })
-        console.log("invoiceData",invoiceData)
+
+
     }
 
-  useEffect(()=>{
-      if(partyId != ""){
+ 
+
+
+  const getPartyItems = (partyName) =>{
+    if(partyName.trim() !== ""){
         setLoading(true);
-        AuthorizedApi.get(`party/all_items?firmId=${firmDetails._id}&partyId=${partyId}`).then(res=>{
+        AuthorizedApi.get(`items/all_party_items?partyName=${partyName}`).then(res=>{
             setLoading(false);
-            setAllPartyItems(res.data);
+            setAllPartyItems(res.data.data);
         }).catch(err=>{
             console.log(err);
             setLoading(false);
         })
-    }
-  },[partyId]) 
-
+  }
+}
 
 
   const getParties = async (query) =>{
     try{
-        const response =await AuthorizedApi.get('party/all'+`?partyName=${query}`)
-        return response.data;
+        const response =await AuthorizedApi.get('/parties/lists'+`?partyName=${query}`);
+        return response.data.data;
     }catch(err){
         return err;
     }
   }
   
-  console.log("party",allPartyItems)
   return (
     <>
         {
@@ -191,31 +203,33 @@ const PaymentIn = () => {
                                 placeholder={"Party Name"}
                                 customLoading = {<>Loading...</>}
                                 value={partyName}
+                                searchQuery = {partySearchQuery}
+                                setSearchQuery={setPartySearchQuery}
                                 onInputChange={(res)=>{
                                     onChangeParty(res)
                                 }}
                                 onSelect = {(res) => 
                                     {
-                                        setPartyId(res._id)
-                                        setCompanyDetails({...companyDetails,party_name:res.party_name,email_id:res.email_id,address:res.address,city:res.city,mobile_number:res.mobile_number,pincode:res.pincode,alt_mobile_number:res.alt_mobile_number,GST_number:res.GST_number,state:res.state})
+                                        setPartyName(res.partyName);
+                                        getPartyItems(res.partyName);
+                                        setCompanyDetails({...companyDetails,partyName:res.partyName,email:res.email,address:res.address,mobileNumber:res.mobileNumber,altMobileNumber:res.altMobileNumber,gstNumber:res.gstNumber})
                                     }
                                 }
-                                
                                 fetchSuggestions ={getParties}
-                                dataKey ="party_name"
+                                dataKey ="partyName"
                                 
                             />                      
-                            <InputComponent inputType="text" labelName="Email Id" inputName="email_id" inputValue={companyDetails.email_id} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
-                            <InputComponent inputType="text" labelName="Address" inputName="address" inputValue={companyDetails.address} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
-                            <InputComponent inputType="text" labelName="City" inputName="city" inputValue={companyDetails.city} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
-                            <SelectComponent labelName="state" inputName="state" inputValue={companyDetails.state} inputArray={stateNames} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>
-                            <InputComponent inputType="number" labelName="pincode" inputName="pincode" inputValue={companyDetails.pincode} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <InputComponent inputType="text" labelName="Email Id" inputName="email" inputValue={companyDetails.email} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <InputComponent inputType="text" labelName="Address" section='address' inputName="address" inputValue={companyDetails.address.address} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <InputComponent inputType="text" labelName="City" section='address' inputName="city" inputValue={companyDetails.address.city} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <SelectComponent labelName="state" section='address' inputName="state" inputValue={companyDetails.address.state} inputArray={stateNames} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>
+                            <InputComponent inputType="number" labelName="pincode" section='address' inputName="pincode" inputValue={companyDetails.address.pincode} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
                             {
                                 showGST &&
-                                <InputComponent inputType="text" labelName="GST Number" inputName="GST_number" inputValue={companyDetails.GST_number} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                                <InputComponent inputType="text" labelName="GST Number" inputName="gstNumber" inputValue={companyDetails.gstNumber} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
                             }
-                            <InputComponent inputType="text" labelName="mobile number" inputName="mobile_number" inputValue={companyDetails.mobile_number} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
-                            <InputComponent inputType="text" labelName="alternate mobile number" inputName="alt_mobile_number" inputValue={companyDetails.alt_mobile_number} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <InputComponent inputType="number" labelName="mobile number" inputName="mobileNumber" inputValue={companyDetails.mobileNumber} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
+                            <InputComponent inputType="number" labelName="alternate mobile number" inputName="altMobileNumber" inputValue={companyDetails.altMobileNumber} jsonDetails={companyDetails} setJsonDetails={setCompanyDetails}/>                        
                         </div>
                     </div>
                     <div className=''>
@@ -230,12 +244,12 @@ const PaymentIn = () => {
                                     })
                                 }
                                 <div className='flex gap-x-4 items-center mb-4'>
-                                    <input className='' type="checkbox" value={showGST} onChange={()=>setShowGST(!showGST)}/>
+                                    <input className='' type="checkbox" checked={showGST} onChange={()=>setShowGST(!showGST)}/>
                                     <label className='text-sm text-sky-500 font-semibold'>Include GST (Goods And Service Tax) </label>
                                 </div>
                                 {
                                     showGST && 
-                                    <div className='flex gap-x-2'>
+                                    <div className='flex gap-x-2 mb-4'>
                                         <InputComponent inputType="number" labelName="CSGT" inputName="CGST" inputValue={GSTDetails.CGST} jsonDetails={GSTDetails} setJsonDetails={setGSTDetails}/>                        
                                         <InputComponent inputType="number" labelName="SGST" inputName="SGST" inputValue={GSTDetails.SGST} jsonDetails={GSTDetails} setJsonDetails={setGSTDetails}/>                        
                                     </div>
@@ -248,7 +262,7 @@ const PaymentIn = () => {
                             <div className='p-4 border border-gray-300 rounded-md h-max mb-2'>
                                 <p className='text-slate-500 mb-4 capitalize font-semibold text-md'>Items Summary</p>
                                 {
-                                    paymentInDetails.items.length == 0 ? 
+                                    paymentInDetails.invoiceItems.length == 0 ? 
                                     <>
                                         <p className='text-center text-gray-400'>Click calcualte to see the summary details </p>
                                     </>:
@@ -259,40 +273,40 @@ const PaymentIn = () => {
                                             <p className='font-semibold text-slate-600'>Total</p>
                                         </div>  
                                         {
-                                            paymentInDetails.items.map((item)=>{
+                                            paymentInDetails.invoiceItems.map((item)=>{
                                                 return(
                                                     <div className='grid grid-cols-4 mb-2'>
-                                                        <p className=' text-slate-600 col-span-2 flex'><span className='w-5/6 truncate overflow-hidden'>{item.item_name}</span> x {item.quantity}</p>
-                                                        <p className=' text-slate-600'>{item.price}</p>
-                                                        <p className=' text-slate-600'>{item.price * item.quantity}</p>
+                                                        <p className=' text-slate-600 col-span-2 flex'><span className='w-5/6 truncate overflow-hidden'>{item.itemName}</span> x {item.quantity}</p>
+                                                        <p className=' text-slate-600'>{parseFloat(item.price).toFixed(2)}</p>
+                                                        <p className=' text-slate-600'>{parseFloat(item.price * item.quantity).toFixed(2)}</p>
                                                     </div>  
                                                 )
                                             })
                                         }
                                         {
-                                            paymentInDetails.includeGST && 
+                                            paymentInDetails.includeGst && 
                                             <>
                                                 <div className='grid grid-cols-4 mb-2'>
                                                     <p className='font-semibold text-slate-500 col-span-2'></p>
                                                     <p className='font-semibold text-slate-500'>Sub Total</p>
-                                                    <p className='font-semibold text-slate-500'>{paymentInDetails.subTotal}</p>
+                                                    <p className='font-semibold text-slate-500'>{parseFloat(paymentInDetails.subtotalPrice).toFixed(2)}</p>
                                                 </div>
                                                 <div className='grid grid-cols-4 mb-2'>
                                                     <p className='font-semibold text-slate-500 col-span-2'></p>
-                                                    <p className='font-semibold text-slate-500'>CGST Price ({paymentInDetails.CGSTPer})%</p>
-                                                    <p className='font-semibold text-slate-500'>{paymentInDetails.CGSTPrice}</p>
+                                                    <p className='font-semibold text-slate-500'>CGST Price ({parseFloat(paymentInDetails.cgstPer).toFixed(2)})%</p>
+                                                    <p className='font-semibold text-slate-500'>{parseFloat(paymentInDetails.cgstPrice).toFixed(2)}</p>
                                                 </div>
                                                 <div className='grid grid-cols-4 mb-2'>
                                                     <p className='font-semibold text-slate-500 col-span-2'></p>
-                                                    <p className='font-semibold text-slate-500'>SGST Price ({paymentInDetails.SGSTPer})%</p>
-                                                    <p className='font-semibold text-slate-500'>{paymentInDetails.SGSTPrice}</p>
+                                                    <p className='font-semibold text-slate-500'>SGST Price ({parseFloat(paymentInDetails.sgstPer).toFixed(2)})%</p>
+                                                    <p className='font-semibold text-slate-500'>{parseFloat(paymentInDetails.sgstPrice).toFixed(2)}</p>
                                                 </div> 
                                             </>
                                         }
                                         <div className='grid grid-cols-4 mb-2'>
                                             <p className='font-semibold text-slate-500 col-span-2'></p>
                                             <p className='font-semibold text-slate-500'>Total</p>
-                                            <p className='font-semibold text-slate-500'>{paymentInDetails.totalPrice}</p>
+                                            <p className='font-semibold text-slate-500'>{parseFloat(paymentInDetails.totalPrice).toFixed(2)}</p>
                                         </div>
                                     </> 
                                 }
@@ -318,7 +332,8 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
 
     const [itemData,setItemData] = useState({})
 
-    
+    const [itemSearchQuery,setItemSearchQuery] = useState("")
+
     const handleDelete = () =>{
         if(allItems.length == 1){
             setToastStatus(false);
@@ -327,7 +342,6 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
         }
         let allItemsModified = [...allItems];
         allItemsModified = allItemsModified.filter((_, i) => i !== itemIndex);
-        console.log("all",allItemsModified)
         setAddedItems(allItemsModified);
 
     }
@@ -343,13 +357,19 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
 
 
     const onChangeItem = (res) =>{
+        console.log("on Item change",res)
+        setItemSearchQuery(res);
         setItemData({
             ...itemData,
-            item_name:res,
+            itemName:res,
         })
+
+        const allItemsModified = [...allItems];
+        allItemsModified[itemIndex] = {...allItemsModified[itemIndex],itemName:res};
+        setAddedItems(allItemsModified);  
     }
 
-    console.log("handleItem",allItems)  
+    console.log(itemData)
     
     useEffect(()=>{
         setItemData({
@@ -364,18 +384,20 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
                 customLoading = {<>Loading...</>}
                 onSelect = {(res) => 
                     {
-                        setItemData({...itemData,item_name:res.item_name,price:res.price})
+                        setItemData({...itemData,itemName:res.itemName,price:res.price})
                         const allItemsModified = [...allItems];
-                        allItemsModified[itemIndex] = {...allItemsModified[itemIndex],item_name:res.item_name,price:res.price};
+                        allItemsModified[itemIndex] = {...allItemsModified[itemIndex],itemName:res.itemName,price:res.price};
                         setAddedItems(allItemsModified);  
                     }
                 }
                 onInputChange={(res)=>{
                     onChangeItem(res)
                 }}
-                value={itemData.item_name}
+                value={itemData.itemName}
+                searchQuery = {itemSearchQuery}
+                setSearchQuery={setItemSearchQuery}
                 staticData={allPartyItems}
-                dataKey ="item_name"          
+                dataKey ="itemName"          
             />  
             <div className='relative mb-4'>
                 <input type='number' id="floating_outlined" class="block px-2 pb-2 pt-2 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " onChange={(e)=>handleItemChange(e)} name="price" value={itemData.price}/>

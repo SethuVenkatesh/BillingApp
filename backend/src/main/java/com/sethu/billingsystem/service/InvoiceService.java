@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -123,6 +124,11 @@ public class InvoiceService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"invoice not found",null);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
+        List<InvoicePayment> invoicePayment = invoicePaymentRepository.findByInvoiceInvoiceId(invoice.getInvoiceId());
+        if(!invoicePayment.isEmpty()){
+            ApiResponse<Object> response =new  ApiResponse<>(false,"Invoice cannot be updated after payment is done",null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
         invoiceMapper.invoiceDTOTOInvoice(requestBody,invoice);
         if(requestBody.getInvoiceItems()!=null){
             invoice.setInvoiceItems(new ArrayList<>());
@@ -186,10 +192,8 @@ public class InvoiceService {
         }
 //        Logic for Making Invoice Payments
         List<InvoicePayment> invoicePayment = invoicePaymentRepository.findByInvoiceInvoiceId(invoice.getInvoiceId());
-        Long totalAmount = invoicePayment.stream()
-                .mapToLong(InvoicePayment::getAmountPaid)
-                .sum();
-        if(totalAmount + requestBody.getAmountPaid() > invoice.getTotalPrice() ){
+        BigDecimal totalAmount = invoicePayment.stream().map(InvoicePayment::getAmountPaid).reduce(BigDecimal.ZERO,BigDecimal::add);
+        if(totalAmount.add(requestBody.getAmountPaid()).compareTo(invoice.getTotalPrice()) > 0 ){
             ApiResponse<Object> response =new ApiResponse<>(false,"amount exceeds total bill amount",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -199,7 +203,7 @@ public class InvoiceService {
         payment.setInvoice(invoice);
         invoicePaymentRepository.save(payment);
 
-        if(totalAmount+requestBody.getAmountPaid() == invoice.getTotalPrice()){
+        if(totalAmount.add(requestBody.getAmountPaid()).equals(invoice.getTotalPrice())){
             invoice.setPaymentStatus(PaymentStage.FULLY_PAID);
             invoiceRepository.save(invoice);
 

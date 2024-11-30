@@ -92,7 +92,7 @@ public class PartyService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         logger.info("create Party : userName : {} ; party : {}",userName,requestBody);
-        if(isAllNull){
+        if(isAllNull && partyImage == null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Values to update",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -184,5 +184,21 @@ public class PartyService {
         partyRepository.deleteById(party.getPartyId());
         ApiResponse<Object> response = new ApiResponse<>(true,"Party Deleted successfully",null);
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse<Object>> getPartyLists(String partyName) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        Customer user = userUtil.getUserDetails(userName);
+        Firm firm = firmUtil.getFirmDetails(user.getUserId());
+        if(firm==null){
+            ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Party> allParties = partyRepository.findByPartyNameContainsIgnoreCaseAndFirmFirmId(partyName,firm.getFirmId());
+        List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties);
+        ApiResponse<Object> response = new ApiResponse<>(true,"Paties containing "+ partyName +" text found",allPartyDTO);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+
     }
 }

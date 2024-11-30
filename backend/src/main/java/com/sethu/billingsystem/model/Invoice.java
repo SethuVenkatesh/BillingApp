@@ -9,6 +9,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -38,19 +39,19 @@ public class Invoice {
     @Column(name = "payment_status")
     private PaymentStage paymentStatus = PaymentStage.NOT_PAID;
     @Column(name = "include_gst")
-    private Boolean includeGst;
-    @Column(name = "cgst_per")
-    private Long cgstPer;
-    @Column(name = "sgst_per")
-    private Long sgstPer;
-    @Column(name = "cgst_price")
-    private Long cgstPrice;
-    @Column(name = "sgst_price")
-    private Long sgstPrice;
-    @Column(name = "total_price")
-    private Long totalPrice;
-    @Column(name = "subtotal_price")
-    private Long subtotalPrice;
+    private Boolean includeGst = false;
+    @Column(name = "cgst_per",precision = 4,scale = 2)
+    private BigDecimal cgstPer;
+    @Column(name = "sgst_per",precision = 4,scale = 2)
+    private BigDecimal sgstPer;
+    @Column(name = "cgst_price",precision = 10,scale = 2)
+    private BigDecimal cgstPrice;
+    @Column(name = "sgst_price",precision = 10,scale = 2)
+    private BigDecimal sgstPrice;
+    @Column(name = "total_price",precision = 10,scale = 2)
+    private BigDecimal totalPrice;
+    @Column(name = "subtotal_price",precision = 10,scale = 2)
+    private BigDecimal subtotalPrice;
 
     @OneToMany(mappedBy = "invoice",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     List<InvoiceItem> invoiceItems;

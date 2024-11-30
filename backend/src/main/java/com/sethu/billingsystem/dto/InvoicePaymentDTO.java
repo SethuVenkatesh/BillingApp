@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -22,7 +23,9 @@ public class InvoicePaymentDTO {
     @NotBlank(groups = {InvoicePaymentDTO.View.Create.class},message = "Payment Mode Cannot be blank")
     private String paymentMode;
     @JsonView(value = {InvoicePaymentDTO.View.External.class})
-    @Min(groups = {InvoicePaymentDTO.View.External.class},value = 10,message = "Amount must be greater than 10")
-    @Max(groups = {InvoicePaymentDTO.View.External.class},value = 10000000,message = "Amount must be less than 10000000")
-    private Long amountPaid;
+    @NotNull(groups = {InvoicePaymentDTO.View.Create.class},message = "amount cannot be blank")
+    @DecimalMin(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},value = "1.00",message = "amount must be greater than 1.00")
+    @DecimalMax(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},value = "99999999.99",message = "amount must be lesser than 99999999.99")
+    @Digits(integer = 8,fraction = 2,message = "amount must be 10 digits with max of 2 decimal points")
+    private BigDecimal amountPaid;
 }

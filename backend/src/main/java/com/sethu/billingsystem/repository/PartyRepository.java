@@ -9,5 +9,9 @@ import java.util.List;
 @Repository
 public interface PartyRepository extends JpaRepository<Party,Long> {
     Party findByPartyNameAndFirmFirmName(String partyName,String firmName);
+
+
+    List<Party> findByPartyNameContainsIgnoreCaseAndFirmFirmId(String partyName,Long firmId);
+
     List<Party> findByFirmFirmId(Long firmId);
 }

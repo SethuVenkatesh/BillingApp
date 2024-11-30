@@ -105,7 +105,7 @@ const SideBar = () => {
                             }
                         </div>
                         {
-                        firmDetails &&
+                        
                         <p className='capitalize font-bold w-full overflow-hidden truncate'>{firmDetails ? firmDetails.firmName :"New Firm"}</p>
                         }   
                         {Icons['arrow-right-icon']}
@@ -217,6 +217,7 @@ const EditFirmComponent = ({onCloseFn}) =>{
     const handleValidate = () =>{
         setLoading(true);
         firmSchemaValidation.validate(firmData,{abortEarly:false}).then(valid=>{
+            console.log("firmDetails ",firmDetails);
             if(firmDetails){
                 if(Object.keys(firmDifferences).length == 0 && uploadFile == null){
                     setLoading(false);
@@ -236,7 +237,7 @@ const EditFirmComponent = ({onCloseFn}) =>{
     const handleSaveFirm = () => {
       
         const formData = new FormData();
-        formData.append("firmDetails", new Blob([JSON.stringify(firmDifferences)],{type:'application/json'}));
+        formData.append("firmDetails", new Blob([JSON.stringify(firmData)],{type:'application/json'}));
         if(uploadFile){
             formData.append("firmImage",uploadFile);
         }
@@ -305,14 +306,15 @@ const EditFirmComponent = ({onCloseFn}) =>{
     },[])
 
 
-
     useEffect(()=>{
-       const differences = getStateDifference(firmDetails,firmData);
-       if(Object.keys(differences).length >= 1){
-        setFirmDifferences(differences);
-       }
-       console.log(Object.keys(differences).length)
-       console.log(differences);
+        if(firmDetails!=null){
+            const differences = getStateDifference(firmDetails,firmData);
+            if(Object.keys(differences).length >= 1){
+             setFirmDifferences(differences);
+            }
+            console.log(Object.keys(differences).length)
+            console.log(differences);
+        }
     },[firmData])
     console.log("firmDiffernce",firmDifferences)
 

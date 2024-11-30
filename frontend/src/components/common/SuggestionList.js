@@ -6,6 +6,8 @@ const SuggestionList = ({
     dataKey,
     onSuggestionClick
 }) => {
+
+    console.log("Suggestion",suggestions,dataKey)
   return (
     <>
         {

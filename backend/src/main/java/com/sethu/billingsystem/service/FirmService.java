@@ -98,7 +98,7 @@ public class FirmService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         logger.info("updateFirm : userName : {} ; firm : {}",userName,firmDTO);
-        if(isAllNull){
+        if(isAllNull && firmImage == null){
             ApiResponse<Object> response =new  ApiResponse<>(false,"No Values to update",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }

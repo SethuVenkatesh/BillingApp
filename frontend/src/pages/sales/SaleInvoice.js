@@ -11,8 +11,8 @@ const SaleInvoice = () => {
     const [allInvoice,setAllInvoice] = useState([])
     useEffect(()=>{
       setLoading(true);
-      AuthorizedApi.get("sales/all_invoice?firm_id="+firmDetails._id).then((res)=>{
-        setAllInvoice(res.data)
+      AuthorizedApi.get("/invoice/all").then((res)=>{
+        setAllInvoice(res.data.data)
         setLoading(false);
       }).catch((err)=>{
         console.log(err);
@@ -26,7 +26,7 @@ const SaleInvoice = () => {
             loading ? 
             <Loader/> : 
             (
-                <div className='p-4 m-2 border'>
+                <div className='p-4 m-2 border rounded-sm border border-gray-300 shadow-md min-h-[calc(100vh-50px)]'>
                     <p className='text-slate-500 mb-4 text-center capitalize font-bold text-lg'>All Invoices</p>
                     <div className='grid gap-2'>                         
                         {

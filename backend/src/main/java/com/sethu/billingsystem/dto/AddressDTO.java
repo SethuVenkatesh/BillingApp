@@ -22,7 +22,7 @@ public class AddressDTO {
     @JsonView(value = {View.External.class})
     private String city;
     @NotBlank(groups = {InvoiceDTO.View.Create.class},message = "state name cannot be blank")
-    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 25,message = "State must be between 5 to 25 characters")
+    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 2, max = 10,message = "State must be between 2 to 10 characters")
     @JsonView(value = {View.External.class})
     private String state;
     @NotNull(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class}, message = "Pincode cannot be null")

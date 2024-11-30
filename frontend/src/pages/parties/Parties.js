@@ -37,12 +37,12 @@ const Parties = () => {
   }
 
 
-  const getAllParties = (toastMessage) =>{
+  const getAllParties = () =>{
       setLoading(true);
       AuthorizedApi.get("/parties/all").then((res)=>{
             setAllParties(res.data.data)
             setLoading(false)
-            setToastMsg(res.data.message);
+            // setToastMsg(res.data.message);
             setToastStatus(true)
           }).catch(err=>{
               setLoading(false);
@@ -52,7 +52,7 @@ const Parties = () => {
     }
 
   useEffect(()=>{
-    getAllParties("")
+    getAllParties()
   },[])
 
 
@@ -170,7 +170,7 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
         const formData = new FormData ();
         formData.append("partyDetails",new Blob([JSON.stringify(partyData)],{type:'application/json'}));
         formData.append("partyImage",uploadFile);
-        AuthorizedApi.post(`/party/new`,partyData).then((res)=>{
+        AuthorizedApi.post(`/parties/new`,formData).then((res)=>{
             console.log(res)
             setLoading(false);
             setToastMsg(res.data.message);
@@ -189,24 +189,13 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
       }
   
 
-  const findEmployeeAge = () =>{
-      var today = new Date();
-      var birthDate = new Date(partyData.date_of_birth);  
-      console.log(today,birthDate)
-      var age_now = today.getFullYear() - birthDate.getFullYear();
-      var m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
-      {
-          age_now--;
-      }
-      return age_now;
-  }
 
   const handleUpdateParty = () =>{
     const formData = new FormData ();
-    formData.append("partyDetails",new Blob([JSON.stringify(partyData)],{type:'application/json'}));
+    formData.append("partyDetails",new Blob([JSON.stringify(partyDifference)],{type:'application/json'}));
     formData.append("partyImage",uploadFile);
-    AuthorizedApi.put(`/party/update/?partyName=${partyData.partyName}`,formData).then((res)=>{
+    console.log(formData);
+    AuthorizedApi.patch(`/parties/update?partyName=${partyData.partyName}`,formData).then((res)=>{
         console.log(res)
         setLoading(false);
         setToastMsg(res.data.message);
@@ -215,7 +204,6 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
         setUploadFile(null)
         getAllParties();
         setShowPopUp(false);
-
     }).catch((err)=>{
         setLoading(false)
         setToastMsg(err.response.data.message);
@@ -256,12 +244,14 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
   },[])
   
   useEffect(()=>{
-    const differences = getStateDifference(partyDetails,partyData);
-    if(Object.keys(differences).length >= 1){
-     setPartyDifference(differences);
+    if(partyData){
+        const differences = getStateDifference(partyDetails,partyData);
+        if(Object.keys(differences).length >= 1){
+         setPartyDifference(differences);
+        }
+        console.log(Object.keys(differences).length)
+        console.log(differences);
     }
-    console.log(Object.keys(differences).length)
-    console.log(differences);
  },[partyData])
 
 
@@ -334,7 +324,7 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
           isNewParty ? 
           <p className='text-white bg-blue-500 rounded-md p-1 cursor-pointer px-6 capitalize w-fit ml-auto mr-2 select-none' onClick={()=>handleValidate()}>save</p>
           :
-          <p className='text-white bg-blue-500 rounded-md p-1 cursor-pointer px-6 capitalize w-fit ml-auto mr-2 select-none' onClick={()=>handleValidate()}>update</p>
+          <p className={`text-white bg-blue-500 rounded-md p-1 cursor-pointer px-6 capitalize w-fit ml-auto mr-2 select-none ${Object.keys(partyDifference).length === 0 && uploadFile == null ? 'cursor-not-allowed bg-gray-500':'cursor-pointer bg-blue-500'}`} onClick={()=>handleValidate()}>update</p>
       }
   </div>
   )
@@ -346,14 +336,14 @@ const PartyCard = ({partyDetails,handleView,handleEdit,handleDelete}) =>{
         <div className='flex gap-x-4 items-center relative'>
             <div className='w-[50px] rounded-full'>
                 {
-                    partyDetails.logo_url == '' ? 
-                    <img src={partyDetails.default_logo_url} alt='Not Found' className='h-full w-full object-cover '/> 
+                    partyDetails.logoUrl == '' ? 
+                    <img src='https://res.cloudinary.com/dkjcfh7oj/image/upload/v1713684716/firms/building_1_jc8pct.png' alt='Not Found' className='h-full w-full object-cover '/> 
                     :
-                    <img src={partyDetails.logo_url} alt='Not Found' className='h-full aspect-square object-cover rounded-full'/> 
+                    <img src={partyDetails.logoUrl} alt='Not Found' className='h-full aspect-square object-cover rounded-full'/> 
                 }
             </div>
             <div className='text-slate-900'>
-                <p className='font-semibold'>{partyDetails.party_name}</p>
+                <p className='font-semibold'>{partyDetails.partyName}</p>
             </div>
             <div className=' relative ml-auto cursor-pointer group'>
                 <div className='p-4'>
@@ -392,55 +382,55 @@ const PartyDetailsPopUp = ({partyDetails}) =>{
     <div className='flex flex-col w-full'>
         <div className='flex items-center justify-center w-full'>
             {
-                <img src={partyDetails.logo_url == '' ? partyDetails.default_logo_url: partyDetails.logo_url} alt='not found' className='w-[100px] aspect-square  object-cover rounded-full'/>
+                <img src={partyDetails.logoUrl == '' ? 'https://res.cloudinary.com/dkjcfh7oj/image/upload/v1713684716/firms/building_1_jc8pct.png': partyDetails.logoUrl} alt='not found' className='w-[100px] aspect-square  object-cover rounded-full'/>
             }
             
         </div>
-        <p className='font-bold text-slate-600 text-center mb-2'>{partyDetails.party_name}</p>
+        <p className='font-bold text-slate-600 text-center mb-2'>{partyDetails.partyName}</p>
         <div className='flex flex-col gap-y-2'>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>GST_number</p>
-                <p>: {partyDetails.GST_number}</p>
+                <p>: {partyDetails.gstNumber}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>Mobile Number</p>
-                <p>: {partyDetails.mobile_number}</p>
+                <p>: {partyDetails.mobileNumber}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>alternate mobile number</p>
-                <p>: {partyDetails.alt_mobile_number}</p>
+                <p>: {partyDetails.altMobileNumber}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>Address</p>
-                <p>: {partyDetails.address}</p>
+                <p>: {partyDetails.address.address}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>City</p>
-                <p>: {partyDetails.city}</p>
+                <p>: {partyDetails.address.city}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>state</p>
-                <p>: {partyDetails.state}</p>
+                <p>: {partyDetails.address.state}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>pincode</p>
-                <p>: {partyDetails.pincode}</p>
+                <p>: {partyDetails.address.pincode}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>Account Number</p>
-                <p>: {partyDetails.account_number}</p>
+                <p>: {partyDetails.bank.accountNumber}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>IFSC Code</p>
-                <p>: {partyDetails.IFSC_code}</p>
+                <p>: {partyDetails.bank.ifscCode}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>Bank Name</p>
-                <p>: {partyDetails.bank_name}</p>
+                <p>: {partyDetails.bank.bankName}</p>
             </div>
             <div className='grid grid-cols-2 text-slate-500 capitalize'>
                 <p className='font-semibold'>Branch</p>
-                <p>: {partyDetails.bank_branch}</p>
+                <p>: {partyDetails.bank.branch}</p>
             </div>
 
         </div>

@@ -11,6 +11,7 @@ public class InvoiceUtil {
     @Autowired
     InvoiceRepository invoiceRepository;
     public Long getNextInvoiceNumber(Long firmId){
+
        return invoiceRepository.countByFirmFirmId(firmId);
     }
 

@@ -25,12 +25,12 @@ public class PartyController {
     PartyService partyService;
     @PostMapping("/new")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Create.class}) @JsonView(value = {PartyDTO.View.Create.class}) PartyDTO requestBody,@RequestPart("partyImage") MultipartFile partyImage){
+    private ResponseEntity<ApiResponse<Object>> createNewParty(@RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Create.class}) @JsonView(value = {PartyDTO.View.Create.class}) PartyDTO requestBody,@RequestPart(value = "partyImage",required = false) MultipartFile partyImage){
        return partyService.createParty(requestBody,partyImage);
     }
     @PatchMapping("/update")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String partyName, @RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Update.class}) @JsonView(value = {PartyDTO.View.Update.class}) PartyDTO requestBody, @RequestPart("partyImage") MultipartFile image){
+    private ResponseEntity<ApiResponse<Object>> updateParty(@RequestParam String partyName, @RequestPart("partyDetails") @Validated(value = {PartyDTO.View.Update.class}) @JsonView(value = {PartyDTO.View.Update.class}) PartyDTO requestBody, @RequestPart(value = "partyImage",required = false) MultipartFile image){
         return partyService.updateParty(partyName,requestBody,image);
     }
 
@@ -40,13 +40,20 @@ public class PartyController {
         return partyService.getPartyDetails(partyName);
     }
 
+
+    @GetMapping("/lists")
+    @JsonView(PartyDTO.View.External.class)
+    private ResponseEntity<ApiResponse<Object>> getPartyLists(@RequestParam String partyName){
+        return partyService.getPartyLists(partyName);
+    }
+
     @GetMapping("/all")
     @JsonView(PartyDTO.View.External.class)
     private ResponseEntity<ApiResponse<Object>> getAllParties(){
         return partyService.getAllParties();
     }
 
-    @DeleteMapping ("delete")
+    @DeleteMapping ("/delete")
     @JsonView(PartyDTO.View.External.class)
     private ResponseEntity<ApiResponse<Object>> deleteParty(@RequestParam String partyName){
         return partyService.deleteParty(partyName);

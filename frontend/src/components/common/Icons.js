@@ -20,6 +20,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PaidIcon from '@mui/icons-material/Paid';
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const Icons = {
     "arrow-right-icon":<ChevronRightIcon/>,
@@ -43,7 +44,8 @@ const Icons = {
     "calculate-icon":<CalculateIcon/>,
     "receipt-icon":<ReceiptLongIcon/>,
     "phone-icon":<LocalPhoneIcon/>,
-    "payment-icon":<PaidIcon/>
+    "payment-icon":<PaidIcon/>,
+    "arrow-outward-icons":<ArrowOutwardIcon/>
 
 }
 
