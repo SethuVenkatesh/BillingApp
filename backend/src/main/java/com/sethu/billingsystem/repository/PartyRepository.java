@@ -1,6 +1,8 @@
 package com.sethu.billingsystem.repository;
 
 import com.sethu.billingsystem.model.Party;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +15,5 @@ public interface PartyRepository extends JpaRepository<Party,Long> {
 
     List<Party> findByPartyNameContainsIgnoreCaseAndFirmFirmId(String partyName,Long firmId);
 
-    List<Party> findByFirmFirmId(Long firmId);
+    Page<Party> findByFirmFirmId(Long firmId, Pageable page);
 }

@@ -5,7 +5,6 @@ import Toaster from '../../components/common/Toaster';
 import { useContext } from 'react';
 import { UserDetailsContext } from '../../context/userContext';
 import { AuthorizedApi } from '../../axios';
-import axios from 'axios';
 import Icons from '../../components/common/Icons';
 import PopupComponent from '../../components/common/PopupComponent';
 import InputComponent from '../../components/common/InputComponent';
@@ -13,6 +12,7 @@ import SelectComponent from '../../components/common/SelectComponent';
 import { stateNames } from '../../constants'
 import {newPartySchemaValidation} from '../../utils/CommonUtils';
 import { getStateDifference } from '../../utils/CommonUtils';
+import Pagination from '../../components/common/Pagination';
 
 const Parties = () => {
   const [loading,setLoading]=useState(false);
@@ -26,6 +26,12 @@ const Parties = () => {
   const { firmDetails } = useContext(UserDetailsContext);
   const [isNewParty,setIsNewParty] = useState(true);
 
+//   Search Query for Pagination
+const [currentPage,setCurrentPage] = useState(1);
+const [itemsPerPage,setItemsPerPage] = useState(20);
+const [totalPages,setTotalPages] = useState(1);
+const [totalCount,setTotalCount] = useState(1);
+
   const onCloseFn=()=>{
       setShowPopUp(false);
     }
@@ -37,13 +43,21 @@ const Parties = () => {
   }
 
 
-  const getAllParties = () =>{
+  const getAllParties = (pageNumber,pageSize) =>{
       setLoading(true);
-      AuthorizedApi.get("/parties/all").then((res)=>{
+      AuthorizedApi.get("/parties/all",{
+        params:{
+            pageNum:pageNumber,
+            pageSize:pageSize
+        }
+      }).then((res)=>{
             setAllParties(res.data.data)
             setLoading(false)
-            // setToastMsg(res.data.message);
-            setToastStatus(true)
+            setTotalCount(res.data.totalCount);
+            setTotalPages(res.data.totalPages);
+            setCurrentPage(res.data.pageNum);
+            setItemsPerPage(res.data.pageSize);
+            setToastStatus(true);
           }).catch(err=>{
               setLoading(false);
               setToastMsg(err.response.data.message);
@@ -52,7 +66,7 @@ const Parties = () => {
     }
 
   useEffect(()=>{
-    getAllParties()
+    getAllParties(1,20)
   },[])
 
 
@@ -76,7 +90,7 @@ const Parties = () => {
       AuthorizedApi.delete("/parties/delete?partyName=" + partyData.partyName).then((res)=>{
           setLoading(false);
           setToastStatus(true);
-          getAllParties()
+          getAllParties(1,20);
       }).catch(err=>{
           setLoading(false);
           setToastMsg(err.response.data.message)
@@ -86,38 +100,42 @@ const Parties = () => {
 
 return (
   <>
-  {
-      loading ? (
-          <Loader/> 
-      ) : (
-          <div className='flex items-center justify-center gap-2 flex-col'>
+
+          <div className='flex items-center justify-center gap-2 flex-col '>
               <PopupComponent isOpen={showPopUp} onCloseFn={()=>onCloseFn()} popUpTitle={popUpTitle} isBtnVisible={false} >
                   {
                       isPopUpEdit ? <PartyPopUp isNewParty={isNewParty} partyDetails={partyDetails} setShowPopUp={setShowPopUp} getAllParties={getAllParties}/> : <PartyDetailsPopUp partyDetails={partyDetails}/>
                   }
               </PopupComponent>
-              <div className='rounded-sm border border-gray-300 shadow-md w-full min-h-[calc(100vh-50px)]'>
+
+              <div className='rounded-sm border border-gray-300 shadow-md w-full relative '>
                   <div className='p-4 border-b border-gray-200 flex items-center'>
                       <p className='font-semibold text-lg text-slate-600 '>Party List</p>
                       <p className='px-2 py-2 shadow-md text-white font-semibold w-fit select-none cursor-pointer rounded-md ml-auto bg-[#212934]' onClick={()=>createNewParty()}>{Icons['add-icon']} Add Parties</p>
                   </div>
-                  <div className='p-4 grid md:grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-1'>
-                      {
-                          allParties.map((party)=>{
-                              return (
-                                  <PartyCard partyDetails={party} handleView={handleView} handleEdit={handleEdit} handleDelete={handleDelete}/>
-                              )
-                          })
-                      }
-                  </div>
+                  <div className='h-[calc(100vh-200px)] overflow-y-auto'>
+                    <div className='p-4 grid md:grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-1 '>
+                        {
+                            allParties.map((party)=>{
+                                return (
+                                    <PartyCard partyDetails={party} handleView={handleView} handleEdit={handleEdit} handleDelete={handleDelete}/>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+
+                  
+                    <Pagination onPageChange={(page,pageSize)=>getAllParties(page,pageSize)} totalCount={totalCount} siblingCount={1} currentPage={currentPage} pageSize={itemsPerPage} totalPages={totalPages}/>
               </div>
+              {loading && <Loader/>}
               {
                   toastMsg.length>=1&&
                   <Toaster toastMsg={toastMsg} setToastMsg={setToastMsg} isSuccess={toastStatus}/>
               }
           </div>
-      ) 
-  }
+      
+  
   </>
   )
 }
@@ -134,15 +152,11 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
   const [uploadFile, setUploadFile] = useState(null);
   const [partyDifference,setPartyDifference] = useState({});
 
-  let today = new Date();
-  let maxDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
 
   const handleTabChange = (tabIndex)=>{
       setSelectedTab(tabIndex)
   }
-  const handleInputChange = (e) =>{
-      setPartyData({...partyData,[e.target.name]:e.target.value})
-  }
+
 
 
   const handleValidate = () =>{
@@ -178,7 +192,7 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
             setToastStatus(true);
             setUploadFile(null)
             setShowPopUp(false);
-            getAllParties();
+            getAllParties(1,20);
             setShowPopUp(false);
         }).catch((err)=>{
             setLoading(false);
@@ -202,7 +216,7 @@ const PartyPopUp = ({isNewParty,partyDetails,getAllParties,setShowPopUp}) =>{
         setPartyData(partyDetails)
         setToastStatus(true);
         setUploadFile(null)
-        getAllParties();
+        getAllParties(1,20);
         setShowPopUp(false);
     }).catch((err)=>{
         setLoading(false)

@@ -13,7 +13,6 @@ import Toaster from './common/Toaster';
 import { stateNames } from '../constants';
 import SelectComponent from './common/SelectComponent';
 import { firmSchemaValidation, getStateDifference } from '../utils/CommonUtils';
-import { type } from '@testing-library/user-event/dist/type';
 
 const SideBar = () => {
     //bg-color #212934

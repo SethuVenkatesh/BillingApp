@@ -8,8 +8,12 @@ import InputComponent from '../../components/common/InputComponent';
 import Loader from '../../components/common/Loader';
 import Toaster from '../../components/common/Toaster';
 import SelectComponent from '../../components/common/SelectComponent'
-import { newItemValidation } from '../../utils/CommonUtils';
+import { getDateInReadableFmt, newItemValidation } from '../../utils/CommonUtils';
 import { getStateDifference } from '../../utils/CommonUtils';
+import Pagination from '../../components/common/Pagination';
+import SortPopUpComponent from '../../components/common/SortPopUpComponent'
+import { itemsFilterData, itemsSortData } from '../../constants';
+import FilterPopUpComponent from '../../components/common/FilterPopUpComponent';
 
 const Items = () => {
   const [loading,setLoading]=useState(false);
@@ -23,17 +27,68 @@ const Items = () => {
   const { firmDetails } = useContext(UserDetailsContext);
   const [isNewItem,setIsNewItem] = useState(true);
 
+  //   Search Query for Pagination
+const [currentPage,setCurrentPage] = useState(1);
+const [itemsPerPage,setItemsPerPage] = useState(20);
+const [totalPages,setTotalPages] = useState(1);
+const [totalCount,setTotalCount] = useState(1);
+
+
+// Filters and Sort
+const [selectedFilter,setSelectedFilter] = useState({
+  itemName:"",
+  partyName:"",
+  minPrice:"0",
+  maxPrice:"1000000"
+});
+const [selectedSort,setSelectedSort] = useState({
+  sortType:"desc",
+  sortKey:"createdAt"
+})
+
+
+const changeSortFn = (sortType,sortKey) =>{
+  setSelectedSort({
+    sortType:sortType,
+    sortKey:sortKey
+  })
+}
+
+const changeFilterValues = (filterKey,filterValue) =>{
+  setSelectedFilter({...selectedFilter,[filterKey]:filterValue})
+}
+
+const resetFilter = () =>{
+  setSelectedFilter({
+    itemName:"",
+    partyName:"",
+    minPrice:"0",
+    maxPrice:"1000000"
+  })
+}
+
 
   const onCloseFn=()=>{
     setToastStatus(true);
     setShowPopUp(false);
   }
 
-  const getAllPartyItems = () =>{
+  const getAllPartyItems = (pageNum,pageSize) =>{
     setLoading(true);
-    AuthorizedApi.get("/items/all").then((res)=>{
+    AuthorizedApi.get("/items/all",{
+      params:{
+        pageNum:pageNum,
+        pageSize:pageSize,
+        ...selectedSort,
+        ...selectedFilter,
+      }
+    }).then((res)=>{
       setAllPartyItems(res.data.data);
       // setToastMsg(res.data.message);
+      setTotalCount(res.data.totalCount);
+      setTotalPages(res.data.totalPages);
+      setCurrentPage(res.data.pageNum);
+      setItemsPerPage(res.data.pageSize);
       setToastStatus(true);
       setLoading(false);
     }).catch(err=>{
@@ -52,6 +107,8 @@ const Items = () => {
   }
 
 
+
+
   const handleEdit = (itemData) =>{
     setIsNewItem(false)
     setIsPopUpEdit(true);
@@ -66,7 +123,7 @@ const Items = () => {
         setLoading(false);
         setToastMsg("Item Deleted successfully");
         setToastStatus(true);
-        getAllPartyItems();
+        getAllPartyItems(1,20);
 
     }).catch(err=>{
         setLoading(false);
@@ -78,23 +135,30 @@ const Items = () => {
 
 
   useEffect(()=>{
-    getAllPartyItems();
-  },[])
-  console.log(allPartyItems);
+    getAllPartyItems(1,20);
+  },[selectedSort])
 
   return (
     <>
       {
         loading ? <Loader/> :
-        <div className='rounded-sm border border-gray-300 shadow-md w-full min-h-[calc(100vh-50px)]'>
+        <div className='flex items-center justify-center gap-2 flex-col '>
           <PopupComponent isOpen={showPopUp} onCloseFn={()=>onCloseFn()} popUpTitle={popUpTitle} isBtnVisible={false} >
               <ItemsPopUp isNewItem={isNewItem} itemDetails={itemDetails} getAllPartyItems={getAllPartyItems} onCloseFn={onCloseFn}/>
           </PopupComponent>
-          <div className='p-4 border-b border-gray-200 flex items-center'>
+          <div className='rounded-sm border border-gray-300 shadow-md w-full relative '>
+
+          <div className='p-4 border-b border-gray-200 flex items-center justify-between'>
               <p className='font-semibold text-lg text-slate-600'>Item List</p>
-              <p className='px-2 py-2 shadow-md text-white font-semibold w-fit select-none cursor-pointer rounded-md ml-auto bg-[#212934]' onClick={()=>createNewItems()}>{Icons['add-icon']} Add Items</p>
+              <div className='flex item-center justify-end gap-x-2'>
+                <SortPopUpComponent data={itemsSortData} selectedItem={selectedSort} changeSortFn={(sortType,sortKey)=>changeSortFn(sortType,sortKey)}/>
+                <FilterPopUpComponent data={itemsFilterData} selectedFilter={selectedFilter} filterChanges = {(filterKey,filterValue)=>changeFilterValues(filterKey,filterValue)} resetFilter= {()=>resetFilter()} applyFilter={()=>getAllPartyItems(1,20)}/>
+                <p className='px-2 py-1 shadow-md text-white w-fit select-none cursor-pointer rounded-md bg-[#212934]' onClick={()=>createNewItems()}>{Icons['add-icon']} Add Items</p>
+              </div>
           </div>
-          <div className='p-4 grid md:grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-1'>
+          <div className='h-[calc(100vh-160px)] overflow-y-auto'>
+
+          <div className='p-4 grid md:grid-cols-1 gap-x-2 gap-y-1 sm:grid-cols-1 lg:grid-cols-2'>
             {
                allPartyItems.map((partyItem)=>{
                     return (
@@ -102,7 +166,11 @@ const Items = () => {
                     )
                 })
             }
+          </div>
+          </div>
+          <Pagination onPageChange={(page,pageSize)=>getAllPartyItems(page,pageSize)} totalCount={totalCount} siblingCount={1} currentPage={currentPage} pageSize={itemsPerPage} totalPages={totalPages}/>
         </div>
+
           {
               toastMsg.length>=1&&
               <Toaster toastMsg={toastMsg} setToastMsg={setToastMsg} isSuccess={toastStatus}/>
@@ -154,7 +222,7 @@ const ItemsPopUp = ({isNewItem,itemDetails,getAllPartyItems,onCloseFn}) =>{
         setToastMsg(res.data.data.message);
         setToastStatus(true);
         onCloseFn();
-        getAllPartyItems();
+        getAllPartyItems(1,20);
     }).catch((err)=>{
         setLoading(false)
         setToastMsg(err.response.data.message);
@@ -173,7 +241,7 @@ const ItemsPopUp = ({isNewItem,itemDetails,getAllPartyItems,onCloseFn}) =>{
         setToastMsg(res.data.message);
         setToastStatus(true);
         onCloseFn();
-        getAllPartyItems();
+        getAllPartyItems(1,20);
     }).catch((err)=>{
         setLoading(false)
         setToastMsg(err.response.data.message);
@@ -183,7 +251,12 @@ const ItemsPopUp = ({isNewItem,itemDetails,getAllPartyItems,onCloseFn}) =>{
 
   const getAllParties = () =>{
     setLoading(true);
-    AuthorizedApi.get("/parties/all").then((res)=>{
+    AuthorizedApi.get("/parties/all",{
+      params:{
+        pageNum:1,
+        pageSize:100,
+      }
+    }).then((res)=>{
             setAllParties(res.data.data);
             setLoading(false)
           }).catch(err=>{
@@ -261,7 +334,7 @@ const ItemsPopUp = ({isNewItem,itemDetails,getAllPartyItems,onCloseFn}) =>{
 const ItemCard = ({itemDetails,handleEdit,handleDelete}) =>{
     
   return(
-      <div className='p-2 border border-gray-300 w-full'>
+      <div className='p-2 border border-gray-300 w-full min-w-[250px]'>
           <div className='flex gap-x-4 items-center relative'>
 
                 <div className='text-slate-900 grid '>
@@ -269,11 +342,12 @@ const ItemCard = ({itemDetails,handleEdit,handleDelete}) =>{
                     <p className='font-bold'>
                       <span className='text-blue-500 mr-2'>{Icons['item-icon']}</span>
                       {itemDetails.itemName} - &#x20b9;{itemDetails.price.toFixed(2)}</p>
-                    <div className='text-sm'>
+                    <div className='text-sm mb-1'>
                       <p className='flex'><p className='font-semibold'>Party name :&nbsp;</p> {itemDetails.party.partyName}</p>
                     </div>
+                    <p className='text-xs text-gray-600'>{getDateInReadableFmt(itemDetails.createdAt)}</p>
                 </div>
-              <div className=' relative ml-auto cursor-pointer group'>
+              <div className=' relative ml-auto cursor-pointer group '>
                   <div className='p-4'>
                       {
                           Icons['more-icon']

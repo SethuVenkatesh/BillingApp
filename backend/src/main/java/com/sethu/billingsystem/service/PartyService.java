@@ -16,6 +16,10 @@ import com.sethu.billingsystem.utils.UserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -151,7 +155,7 @@ public class PartyService {
     }
 
 
-    public ResponseEntity<ApiResponse<Object>> getAllParties() {
+    public ResponseEntity<ApiResponse<Object>> getAllParties(Integer pageNum,Integer pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
@@ -160,9 +164,10 @@ public class PartyService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<Party> allParties = partyRepository.findByFirmFirmId(firm.getFirmId());
-        List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties);
-        ApiResponse<Object> response = new ApiResponse<>(true,"List of parties under firm fetched",allPartyDTO);
+        Pageable pageable = PageRequest.of(pageNum-1,pageSize, Sort.by("createdAt").descending());
+        Page<Party> allParties = partyRepository.findByFirmFirmId(firm.getFirmId(),pageable);
+        List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties.getContent());
+        ApiResponse<Object> response = new ApiResponse<>(true,"List of parties under firm fetched",allPartyDTO,allParties.getPageable().getPageNumber()+1,allParties.getPageable().getPageSize(), allParties.getTotalElements(), allParties.getTotalPages());
         return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
@@ -197,7 +202,7 @@ public class PartyService {
         }
         List<Party> allParties = partyRepository.findByPartyNameContainsIgnoreCaseAndFirmFirmId(partyName,firm.getFirmId());
         List<PartyDTO> allPartyDTO = partyMapper.partyListToDTOList(allParties);
-        ApiResponse<Object> response = new ApiResponse<>(true,"Paties containing "+ partyName +" text found",allPartyDTO);
+        ApiResponse<Object> response = new ApiResponse<>(true,"Parties containing "+ partyName +" text found",allPartyDTO);
         return new ResponseEntity<>(response,HttpStatus.OK);
 
     }

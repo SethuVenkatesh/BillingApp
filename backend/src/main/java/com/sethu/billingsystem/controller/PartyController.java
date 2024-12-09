@@ -43,17 +43,17 @@ public class PartyController {
 
     @GetMapping("/lists")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getPartyLists(@RequestParam String partyName){
+    private ResponseEntity<ApiResponse<Object>> getPartyLists(@RequestParam(required = true) String partyName){
         return partyService.getPartyLists(partyName);
     }
 
     @GetMapping("/all")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getAllParties(){
-        return partyService.getAllParties();
+    private ResponseEntity<ApiResponse<Object>> getAllParties(@RequestParam(required = false,defaultValue = "1") Integer pageNum, @RequestParam(required = false,defaultValue = "20") Integer pageSize){
+        return partyService.getAllParties(pageNum,pageSize);
     }
 
-    @DeleteMapping ("/delete")
+    @DeleteMapping ("/delete")  
     @JsonView(PartyDTO.View.External.class)
     private ResponseEntity<ApiResponse<Object>> deleteParty(@RequestParam String partyName){
         return partyService.deleteParty(partyName);

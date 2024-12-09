@@ -1,4 +1,5 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HomeIcon from '@mui/icons-material/Home';
 import GroupIcon from '@mui/icons-material/Group';
 import CategoryIcon from '@mui/icons-material/Category';
@@ -21,9 +22,13 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PaidIcon from '@mui/icons-material/Paid';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+import SortIcon from '@mui/icons-material/Sort';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Icons = {
     "arrow-right-icon":<ChevronRightIcon/>,
+    "arrow-left-icon":<ChevronLeftIcon/>,
     "arrow-up-icon":<KeyboardArrowUpIcon/>,
     "arrow-down-icon":<KeyboardArrowDownIcon/>,
     "home-icon":<HomeIcon/>,
@@ -45,8 +50,10 @@ const Icons = {
     "receipt-icon":<ReceiptLongIcon/>,
     "phone-icon":<LocalPhoneIcon/>,
     "payment-icon":<PaidIcon/>,
-    "arrow-outward-icons":<ArrowOutwardIcon/>
-
+    "arrow-outward-icons":<ArrowOutwardIcon/>,
+    "sort-icon":<SortIcon/>,
+    "filter-icon":<FilterAltIcon/>,
+    "close-icon":<CloseIcon/>
 }
 
 export default Icons;

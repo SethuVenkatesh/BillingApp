@@ -71,7 +71,7 @@ export const employeeDetailsParams=[
  
 
 export const bankDetailsParams=[
-    {inputType:"5",labelName:"bank name",inputName:'bank_name'},
+    {inputType:"text",labelName:"bank name",inputName:'bank_name'},
     {inputType:"text",labelName:"bank branch",inputName:'bank_branch'},
     {inputType:"text",labelName:"account number",inputName:'account_number'},
     {inputType:"text",labelName:"IFSC code",inputName:'IFSC_code'}
@@ -99,4 +99,21 @@ export const sideBarTabs = [
 export const sideBarAccountTabs = [
     {icon:Icons['settings-icon'],tabName:"Settings"},
     {icon:Icons['logout-icon'],tabName:"Logout"}
+]
+
+
+export const itemsSortData = [
+    {title:"Item Name (Asc)",sortType:"asc",key:"itemName"},
+    {title:"Item Name (Desc)",sortType:"desc",key:"itemName"},
+    {title:"Item Price (Asc)",sortType:"asc",key:"price"},
+    {title:"Item Price (Desc)",sortType:"desc",key:"price"},
+    {title:"Created Time (Asc)",sortType:"asc",key:"createdAt"},
+    {title:"Created Time (Desc)",sortType:"desc",key:"createdAt"},
+]
+
+export const itemsFilterData = [
+    {labelName:"Item Name",inputType:"text",inputName:"itemName"},
+    {labelName:"Item Price",inputType:"range",minInputName:"minPrice",maxInputName:"maxPrice",minValue:0,maxValue:1000000},
+    {labelName:"Party Name",inputType:"text",inputName:"partyName"},
+
 ]
