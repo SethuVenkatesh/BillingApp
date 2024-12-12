@@ -127,9 +127,10 @@ public class ItemService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"User dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        Long firmId = firm.getFirmId();
         Sort sort = sortType.equals("desc")? Sort.by(sortKey).descending() : Sort.by(sortKey).ascending();
         Pageable itemPageable = PageRequest.of(pageNum-1,pageSize,sort);
-        Page<Item> allItems = itemRepository.findAll(itemSpecification.getAllItems(itemName,partyName,minPrice,maxPrice),itemPageable);
+        Page<Item> allItems = itemRepository.findAll(itemSpecification.getAllItems(itemName,partyName,minPrice,maxPrice,firmId),itemPageable);
         List<ItemDTO> allItemsDTO = itemMapper.itemListToDTOList(allItems.getContent());
         ApiResponse<Object> response = new ApiResponse<>(true,"all items are fetched successfully",allItemsDTO,allItems.getPageable().getPageNumber()+1,allItems.getPageable().getPageSize(),allItems.getTotalElements(),allItems.getTotalPages());
         return new ResponseEntity<>(response,HttpStatus.OK);

@@ -10,11 +10,16 @@ import com.sethu.billingsystem.model.*;
 import com.sethu.billingsystem.repository.InvoiceItemRepository;
 import com.sethu.billingsystem.repository.InvoicePaymentRepository;
 import com.sethu.billingsystem.repository.InvoiceRepository;
+import com.sethu.billingsystem.specification.InvoiceSpecification;
 import com.sethu.billingsystem.utils.CommonUtil;
 import com.sethu.billingsystem.utils.FirmUtil;
 import com.sethu.billingsystem.utils.InvoiceUtil;
 import com.sethu.billingsystem.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,9 +28,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class InvoiceService {
@@ -36,6 +40,9 @@ public class InvoiceService {
     FirmUtil firmUtil;
     @Autowired
     CommonUtil util;
+
+    @Autowired
+    InvoiceSpecification invoiceSpecification;
 
     @Autowired
     InvoiceRepository invoiceRepository;
@@ -90,7 +97,7 @@ public class InvoiceService {
     }
 
 
-    public ResponseEntity<ApiResponse<Object>> getAllInvoice() {
+    public ResponseEntity<ApiResponse<Object>> getAllInvoice(Integer pageNum, Integer pageSize, String sortKey, String sortType, Long invoiceNumber, String partyName, Date invoiceStartDate, Date invoiceEndDate, PaymentStage paymentStatus) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         Customer user = userUtil.getUserDetails(userName);
@@ -99,9 +106,12 @@ public class InvoiceService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"User Don't have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<Invoice> allInvoices = invoiceRepository.findByFirmFirmIdOrderByInvoiceDateDesc(firmDetails.getFirmId());
-        List<InvoiceDTO> allInvoiceDTO = invoiceMapper.invoiceListToDTOList(allInvoices);
-        ApiResponse<Object> response =new  ApiResponse<>(true,"List of Invoices fetched successfully",allInvoiceDTO);
+        Sort sort = sortType.equals("desc")? Sort.by(sortKey).descending() : Sort.by(sortKey).ascending();
+        Pageable invoicePageable = PageRequest.of(pageNum-1,pageSize,sort);
+//        List<Invoice> allInvoices = invoiceRepository.findByFirmFirmIdOrderByInvoiceDateDesc(firmDetails.getFirmId());
+        Page<Invoice> allInvoices = invoiceRepository.findAll(invoiceSpecification.findAllInvoice(invoiceNumber,partyName,paymentStatus,invoiceStartDate,invoiceEndDate, firmDetails.getFirmId()),invoicePageable);
+        List<InvoiceDTO> allInvoiceDTO = invoiceMapper.invoiceListToDTOList(allInvoices.getContent());
+        ApiResponse<Object> response =new  ApiResponse<>(true,"List of Invoices fetched successfully",allInvoiceDTO,allInvoices.getPageable().getPageNumber()+1,allInvoices.getPageable().getPageSize(), allInvoices.getTotalElements(), allInvoices.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -27,12 +27,12 @@ public class Party {
     private String mobileNumber;
     @Column(name = "alt_mobile_number")
     private String altMobileNumber;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Firm firm;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "bank_id")
     private Bank bank;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")
     private Address address;
     @Column(name = "created_at")

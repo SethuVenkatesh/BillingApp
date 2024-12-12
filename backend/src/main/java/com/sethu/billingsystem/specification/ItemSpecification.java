@@ -1,11 +1,13 @@
 package com.sethu.billingsystem.specification;
 
+import com.sethu.billingsystem.model.Firm;
 import com.sethu.billingsystem.model.Item;
 import com.sethu.billingsystem.model.Party;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.servlet.http.Part;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +18,7 @@ import java.util.List;
 @Component
 public class ItemSpecification {
 
-    public Specification<Item> getAllItems(String itemName,String partyName,BigDecimal minPrice,BigDecimal maxPrice){
+    public Specification<Item> getAllItems(String itemName,String partyName,BigDecimal minPrice,BigDecimal maxPrice,Long firmId){
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if(!itemName.isEmpty()){
@@ -24,8 +26,15 @@ public class ItemSpecification {
             }
             if(!partyName.isEmpty()){
                 Join<Item, Party> itemPartyJoin = root.join("party", JoinType.INNER);
+                Join<Party, Firm> partyFirmJoin = itemPartyJoin.join("firm",JoinType.INNER);
+                predicates.add(criteriaBuilder.equal(partyFirmJoin.get("firmId"),firmId));
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(itemPartyJoin.get("partyName")),"%"+partyName.toLowerCase()+"%"));
+            }else{
+                Join<Item, Party> itemPartyJoin = root.join("party", JoinType.INNER);
+                Join<Party, Firm> partyFirmJoin = itemPartyJoin.join("firm",JoinType.INNER);
+                predicates.add(criteriaBuilder.equal(partyFirmJoin.get("firmId"),firmId));
             }
+
             predicates.add(criteriaBuilder.between(root.get("price"),minPrice,maxPrice));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

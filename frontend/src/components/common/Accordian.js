@@ -9,9 +9,9 @@ const Accordian = ({expand,setExpand,title,callBackfn,children}) => {
 
  const handleExpand = () =>{
     setExpand(!expand);
-    if(accordianList==null || accordianList==undefined){
+    // if(accordianList==null || accordianList==undefined){
         getAccordianList();
-    }
+    // }
  }
 
 

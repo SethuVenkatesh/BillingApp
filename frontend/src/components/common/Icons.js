@@ -25,11 +25,13 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import SortIcon from '@mui/icons-material/Sort';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseIcon from '@mui/icons-material/Close';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 
 const Icons = {
     "arrow-right-icon":<ChevronRightIcon/>,
     "arrow-left-icon":<ChevronLeftIcon/>,
     "arrow-up-icon":<KeyboardArrowUpIcon/>,
+    "double-arrow-icon":<KeyboardDoubleArrowDownIcon/>,
     "arrow-down-icon":<KeyboardArrowDownIcon/>,
     "home-icon":<HomeIcon/>,
     "party-icon":<ApartmentIcon/>,

@@ -34,7 +34,7 @@ const SortPopUpComponent = ({data,selectedItem,changeSortFn}) => {
     
   return (
     <div className='relative' ref={sortRef}>
-      <p className='px-2 py-1 text-[#212934] border border-[#212934] rounded-md shadow-full w-fit cursor-pointer font-semibold'onClick={()=>showSortPopUp()}>{Icons['sort-icon']} Sort</p>
+      <p className='px-2 py-1 text-[#212934] border border-[#212934] rounded-md shadow-md w-fit cursor-pointer font-semibold'onClick={()=>showSortPopUp()}>{Icons['sort-icon']} Sort</p>
       {
         sortPopUp &&
         <div className='absolute  right-0 top-140 z-10 ' >

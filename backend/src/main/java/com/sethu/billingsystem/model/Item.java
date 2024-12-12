@@ -20,7 +20,7 @@ public class Item {
     private String itemName;
     @Column(name = "price",precision = 8,scale = 2)
     private BigDecimal price;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Party party;
     @Column(name = "created_at")
     @CreationTimestamp

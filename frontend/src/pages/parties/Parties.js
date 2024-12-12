@@ -11,8 +11,11 @@ import InputComponent from '../../components/common/InputComponent';
 import SelectComponent from '../../components/common/SelectComponent';
 import { stateNames } from '../../constants'
 import {newPartySchemaValidation} from '../../utils/CommonUtils';
-import { getStateDifference } from '../../utils/CommonUtils';
+import { getStateDifference,getDateInReadableFmt } from '../../utils/CommonUtils';
 import Pagination from '../../components/common/Pagination';
+import SortPopUpComponent from '../../components/common/SortPopUpComponent';
+import FilterPopUpComponent from '../../components/common/FilterPopUpComponent';
+import { partyFilterData, partySortData } from '../../constants';
 
 const Parties = () => {
   const [loading,setLoading]=useState(false);
@@ -32,6 +35,34 @@ const [itemsPerPage,setItemsPerPage] = useState(20);
 const [totalPages,setTotalPages] = useState(1);
 const [totalCount,setTotalCount] = useState(1);
 
+// Filters and Sort
+const [selectedFilter,setSelectedFilter] = useState({
+    partyName:""
+  });
+  const [selectedSort,setSelectedSort] = useState({
+    sortType:"desc",
+    sortKey:"createdAt"
+  })
+
+
+  const changeSortFn = (sortType,sortKey) =>{
+    setSelectedSort({
+      sortType:sortType,
+      sortKey:sortKey
+    })
+  }
+  
+  const changeFilterValues = (filterKey,filterValue) =>{
+    setSelectedFilter({...selectedFilter,[filterKey]:filterValue})
+  }
+  
+  const resetFilter = () =>{
+    setSelectedFilter({
+      partyName:"",
+    })
+  }
+
+
   const onCloseFn=()=>{
       setShowPopUp(false);
     }
@@ -48,7 +79,9 @@ const [totalCount,setTotalCount] = useState(1);
       AuthorizedApi.get("/parties/all",{
         params:{
             pageNum:pageNumber,
-            pageSize:pageSize
+            pageSize:pageSize,
+            ...selectedSort,
+            ...selectedFilter
         }
       }).then((res)=>{
             setAllParties(res.data.data)
@@ -67,7 +100,7 @@ const [totalCount,setTotalCount] = useState(1);
 
   useEffect(()=>{
     getAllParties(1,20)
-  },[])
+  },[selectedSort])
 
 
 
@@ -109,12 +142,16 @@ return (
               </PopupComponent>
 
               <div className='rounded-sm border border-gray-300 shadow-md w-full relative '>
-                  <div className='p-4 border-b border-gray-200 flex items-center'>
+                  <div className='p-4 border-b border-gray-200 flex items-center justify-between'>
                       <p className='font-semibold text-lg text-slate-600 '>Party List</p>
-                      <p className='px-2 py-2 shadow-md text-white font-semibold w-fit select-none cursor-pointer rounded-md ml-auto bg-[#212934]' onClick={()=>createNewParty()}>{Icons['add-icon']} Add Parties</p>
+                      <div className='flex item-center justify-end gap-x-2'>
+                        <SortPopUpComponent data={partySortData} selectedItem={selectedSort} changeSortFn={(sortType,sortKey)=>changeSortFn(sortType,sortKey)}/>
+                        <FilterPopUpComponent data={partyFilterData} selectedFilter={selectedFilter} filterChanges = {(filterKey,filterValue)=>changeFilterValues(filterKey,filterValue)} resetFilter= {()=>resetFilter()} applyFilter={()=>getAllParties(1,20)}/>
+                        <p className='px-2 py-1 shadow-md text-white font-semibold w-fit select-none cursor-pointer rounded-md  bg-[#212934]' onClick={()=>createNewParty()}>{Icons['add-icon']} Add Parties</p>
+                     </div>
                   </div>
                   <div className='h-[calc(100vh-200px)] overflow-y-auto'>
-                    <div className='p-4 grid md:grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-1 '>
+                    <div className='p-4 grid md:grid-cols-1 gap-x-2 gap-y-1 sm:grid-cols-1 lg:grid-cols-2'>
                         {
                             allParties.map((party)=>{
                                 return (
@@ -356,8 +393,9 @@ const PartyCard = ({partyDetails,handleView,handleEdit,handleDelete}) =>{
                     <img src={partyDetails.logoUrl} alt='Not Found' className='h-full aspect-square object-cover rounded-full'/> 
                 }
             </div>
-            <div className='text-slate-900'>
+            <div className='text-slate-900 '>
                 <p className='font-semibold'>{partyDetails.partyName}</p>
+                <p className='text-xs text-gray-600'>Created at : {getDateInReadableFmt(partyDetails.createdAt)}</p>
             </div>
             <div className=' relative ml-auto cursor-pointer group'>
                 <div className='p-4'>

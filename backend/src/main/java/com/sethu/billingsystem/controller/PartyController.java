@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -49,8 +50,8 @@ public class PartyController {
 
     @GetMapping("/all")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getAllParties(@RequestParam(required = false,defaultValue = "1") Integer pageNum, @RequestParam(required = false,defaultValue = "20") Integer pageSize){
-        return partyService.getAllParties(pageNum,pageSize);
+    private ResponseEntity<ApiResponse<Object>> getAllParties(@RequestParam(required = false,defaultValue = "1") Integer pageNum, @RequestParam(required = false,defaultValue = "20") Integer pageSize, @RequestParam(required = false,defaultValue = "desc") String sortType, @RequestParam(required = false,defaultValue = "createdAt") String sortKey, @RequestParam(required = false,defaultValue = "") String partyName){
+        return partyService.getAllParties(pageNum,pageSize,sortType,sortKey,partyName);
     }
 
     @DeleteMapping ("/delete")  

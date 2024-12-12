@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 
 
-
-    @Data
+@Data
     public class PartyDTO {
         public interface View {
             interface External extends ResponseDTO.View.Public,AddressDTO.View.External,BankDTO.View.External{}
@@ -39,6 +39,8 @@ import lombok.Data;
         @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Alternate Mobile Number is invalid")
         @JsonView(value = {PartyDTO.View.External.class})
         private String altMobileNumber;
+        @JsonView(value = {PartyDTO.View.External.class})
+        private LocalDateTime createdAt;
         @JsonView(value = {PartyDTO.View.External.class})
         private BankDTO bank;
         @JsonView(value = {PartyDTO.View.External.class})
