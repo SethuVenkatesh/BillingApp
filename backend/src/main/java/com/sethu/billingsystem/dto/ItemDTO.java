@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class ItemDTO {
@@ -26,6 +28,8 @@ public class ItemDTO {
     @Digits(integer = 6,fraction = 2,message = "price must be number with 8 digits and maximum of 2 decimal points ")
     @JsonView(value = {ItemDTO.View.External.class})
     private BigDecimal price;
+    @JsonView(value = {ItemDTO.View.External.class})
+    private LocalDateTime createdAt;
     @JsonView(value = {ItemDTO.View.External.class})
     private PartyDTO party;
 

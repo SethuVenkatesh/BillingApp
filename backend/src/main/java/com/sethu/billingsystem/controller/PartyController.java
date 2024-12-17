@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -43,17 +44,17 @@ public class PartyController {
 
     @GetMapping("/lists")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getPartyLists(@RequestParam String partyName){
+    private ResponseEntity<ApiResponse<Object>> getPartyLists(@RequestParam(required = true) String partyName){
         return partyService.getPartyLists(partyName);
     }
 
     @GetMapping("/all")
     @JsonView(PartyDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getAllParties(){
-        return partyService.getAllParties();
+    private ResponseEntity<ApiResponse<Object>> getAllParties(@RequestParam(required = false,defaultValue = "1") Integer pageNum, @RequestParam(required = false,defaultValue = "20") Integer pageSize, @RequestParam(required = false,defaultValue = "desc") String sortType, @RequestParam(required = false,defaultValue = "createdAt") String sortKey, @RequestParam(required = false,defaultValue = "") String partyName){
+        return partyService.getAllParties(pageNum,pageSize,sortType,sortKey,partyName);
     }
 
-    @DeleteMapping ("/delete")
+    @DeleteMapping ("/delete")  
     @JsonView(PartyDTO.View.External.class)
     private ResponseEntity<ApiResponse<Object>> deleteParty(@RequestParam String partyName){
         return partyService.deleteParty(partyName);

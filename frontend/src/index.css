@@ -226,6 +226,29 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
+/* Range Slider */
+
+
+
+input[type="range"].range-thumb::-webkit-slider-thumb {
+  appearance: none;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 14px solid #212934; /* Tailwind blue-500 */
+  cursor: pointer;
+}
+
+input[type="range"].range-thumb::-moz-range-thumb {
+  appearance: none;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 14px solid #212934; /* Tailwind blue-500 */
+  cursor: pointer;
+}
 
 
 /* 404 page styles */

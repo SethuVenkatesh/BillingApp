@@ -14,7 +14,6 @@ const InvoiceCard = ({invoiceDetails}) => {
     let allItems = invoiceDetails.invoiceItems;
     let totalQuantity = 0;
     for(let itemIndex = 0 ; itemIndex < allItems.length ;itemIndex++){
-      console.log(allItems[itemIndex])
       totalQuantity = totalQuantity + allItems[itemIndex].quantity;
     }
     return totalQuantity;
@@ -27,8 +26,8 @@ const InvoiceCard = ({invoiceDetails}) => {
   }
   
   return (
-    <div className='border border-gray-300 rounded-sm px-2 py-2 cursor-pointer' onClick={()=>{handleInvoice()}}>
-        <div className='flex justify-between'>
+    <div className='border border-gray-300 rounded-sm px-2 py-2 cursor-pointer min-w-[400px] w-full flex flex-col' onClick={()=>{handleInvoice()}}>
+        <div className='flex justify-between flex-wrap'>
             <div className='flex gap-x-2'>
               <p className='text-blue-800'>{Icons['receipt-icon']}</p>
               <p className='text-slate-500 font-semibold'><span className='font-bold'>Invoice No: </span>{invoiceDetails.invoiceNumber}</p>
@@ -39,17 +38,17 @@ const InvoiceCard = ({invoiceDetails}) => {
             </div>
             <p className='text-slate-500 font-semibold text-sm'><span className='font-bold'>Invoice Date: </span>{invoiceDetails.invoiceDate}</p>
         </div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between flex-wrap'>
           <p className='text-slate-500 capitalize font-semibold text-md'>{invoiceDetails.invoiceParty.partyName}</p>
-          <div className='flex items-center gap-x-2'>
-            <span className='text-green-600'>{Icons['phone-icon']}</span>
-            <span>{invoiceDetails.invoiceParty.mobileNumber}</span>
+          <div className='flex items-center gap-x-2 text-sm'>
+            <span className='text-green-600 '>{Icons['phone-icon']}</span>
+            <span className='text-gray-700'> {invoiceDetails.invoiceParty.mobileNumber}</span>
           </div>
         </div>
         <div className=''>
-          <p className='text-red-500 text-md font-semibold'><span className='font-semibold'>Bill Amount : </span>&#8377; {invoiceDetails.totalPrice.toFixed(2)}</p>
+          <p className='text-red-500 text-md'><span className=''>Bill Amount : </span>&#8377; {invoiceDetails.totalPrice.toFixed(2)}</p>
         </div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between flex-wrap'>
           <div className='flex gap-x-2'>
             <p className='text-slate-500  text-sm'><span className='font-normal'>Total Items: </span>{invoiceDetails.invoiceItems.length}</p>
             <p className='text-slate-500  text-sm'><span className='font-normal'>Total Quantity: </span>{getInvoiceSummary}</p>

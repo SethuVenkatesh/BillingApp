@@ -343,7 +343,7 @@ const PaymentStatus = ({totalAmount,paymentStatus,invoiceNumber,getInvoiceDetail
             </div>
                 <div className='grid grid-cols-2 gap-x-2 items-center '>
                     <p className='text-gray-600 font-semibold'>Payment Mode</p>
-                    <select className={`border border-gray-300 py-2 px-2 text-md rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-800  cursor-pointer`} name='paymentMode' value={paymentDetails.paymentMode} onChange={(e)=>setPaymentDetails({...paymentDetails,[e.target.name]:e.target.value})} disabled={!fieldEnable}>
+                    <select className={`border border-gray-300 py-2 px-2 text-md rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-800  cursor-pointer`} name='paymentMode' value={paymentDetails.paymentMode} onChange={(e)=>setPaymentDetails({...paymentDetails,[e.target.name]:e.target.value})} >
                         <option value="" disabled>Select Payment Mode</option>
                         <option value="UPI (Gpay/PhonePe)">UPI (Gpay/PhonePe)</option>     
                         <option value="Account Transfer">Account Transfer</option>  

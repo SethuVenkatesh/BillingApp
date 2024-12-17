@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -33,8 +34,8 @@ public class ItemController {
 
     @GetMapping(value = "/all")
     @JsonView(ItemDTO.View.External.class)
-    private ResponseEntity<ApiResponse<Object>> getAllItems(){
-        return itemService.getAllItems();
+    private ResponseEntity<ApiResponse<Object>> getAllItems(@RequestParam(required = false,defaultValue = "1") Integer pageNum, @RequestParam(required = false,defaultValue = "20") Integer pageSize, @RequestParam(required = false,defaultValue = "desc") String sortType, @RequestParam(required = false,defaultValue = "createdAt") String sortKey, @RequestParam(required = false,defaultValue = "0") BigDecimal minPrice,@RequestParam(required = false,defaultValue = "1000000") BigDecimal maxPrice,@RequestParam(required = false,defaultValue = "") String itemName,@RequestParam(required = false,defaultValue = "") String partyName){
+        return itemService.getAllItems(pageNum,pageSize,sortType,sortKey,minPrice,maxPrice,itemName,partyName);
     }
     @PostMapping(value = "/new")
     @JsonView(ItemDTO.View.External.class)

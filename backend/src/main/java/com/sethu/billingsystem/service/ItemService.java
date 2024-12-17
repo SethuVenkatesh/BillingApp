@@ -7,14 +7,21 @@ import com.sethu.billingsystem.repository.FirmRepository;
 import com.sethu.billingsystem.repository.ItemRepository;
 import com.sethu.billingsystem.repository.PartyRepository;
 import com.sethu.billingsystem.repository.UserRepository;
+import com.sethu.billingsystem.specification.ItemSpecification;
 import com.sethu.billingsystem.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -25,6 +32,8 @@ public class ItemService {
     UserRepository userRepository;
     @Autowired
     FirmRepository firmRepository;
+    @Autowired
+    ItemSpecification itemSpecification;
     @Autowired
     PartyRepository partyRepository;
     @Autowired
@@ -108,7 +117,7 @@ public class ItemService {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse<Object>> getAllItems() {
+    public ResponseEntity<ApiResponse<Object>> getAllItems(Integer pageNum, Integer pageSize, String sortType, String sortKey, BigDecimal minPrice, BigDecimal maxPrice, String itemName, String partyName) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
 
@@ -118,11 +127,12 @@ public class ItemService {
             ApiResponse<Object> response =new  ApiResponse<>(false,"User dont have any firm",null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<Party> parties = partyRepository.findByFirmFirmId(firm.getFirmId());
-        List<String> allParties = parties.stream().map(Party::getPartyName).toList();
-        List<Item> allItems = itemRepository.findByPartyPartyNameIn(allParties);
-        List<ItemDTO> allItemsDTO = itemMapper.itemListToDTOList(allItems);
-        ApiResponse<Object> response = new ApiResponse<>(true,"all items are fetched successfully",allItemsDTO);
+        Long firmId = firm.getFirmId();
+        Sort sort = sortType.equals("desc")? Sort.by(sortKey).descending() : Sort.by(sortKey).ascending();
+        Pageable itemPageable = PageRequest.of(pageNum-1,pageSize,sort);
+        Page<Item> allItems = itemRepository.findAll(itemSpecification.getAllItems(itemName,partyName,minPrice,maxPrice,firmId),itemPageable);
+        List<ItemDTO> allItemsDTO = itemMapper.itemListToDTOList(allItems.getContent());
+        ApiResponse<Object> response = new ApiResponse<>(true,"all items are fetched successfully",allItemsDTO,allItems.getPageable().getPageNumber()+1,allItems.getPageable().getPageSize(),allItems.getTotalElements(),allItems.getTotalPages());
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     public ResponseEntity<ApiResponse<Object>> getAllPartyItems(String partyName){

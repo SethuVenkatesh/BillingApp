@@ -71,7 +71,7 @@ export const employeeDetailsParams=[
  
 
 export const bankDetailsParams=[
-    {inputType:"5",labelName:"bank name",inputName:'bank_name'},
+    {inputType:"text",labelName:"bank name",inputName:'bank_name'},
     {inputType:"text",labelName:"bank branch",inputName:'bank_branch'},
     {inputType:"text",labelName:"account number",inputName:'account_number'},
     {inputType:"text",labelName:"IFSC code",inputName:'IFSC_code'}
@@ -99,4 +99,46 @@ export const sideBarTabs = [
 export const sideBarAccountTabs = [
     {icon:Icons['settings-icon'],tabName:"Settings"},
     {icon:Icons['logout-icon'],tabName:"Logout"}
+]
+
+
+export const itemsSortData = [
+    {title:"Item Name (Asc)",sortType:"asc",key:"itemName"},
+    {title:"Item Name (Desc)",sortType:"desc",key:"itemName"},
+    {title:"Item Price (Asc)",sortType:"asc",key:"price"},
+    {title:"Item Price (Desc)",sortType:"desc",key:"price"},
+    {title:"Created Time (Asc)",sortType:"asc",key:"createdAt"},
+    {title:"Created Time (Desc)",sortType:"desc",key:"createdAt"},
+]
+
+export const itemsFilterData = [
+    {labelName:"Item Name",inputType:"text",inputName:"itemName"},
+    {labelName:"Item Price",inputType:"range",minInputName:"minPrice",maxInputName:"maxPrice",minValue:0,maxValue:1000000},
+    {labelName:"Party Name",inputType:"text",inputName:"partyName"},
+]
+
+
+export const partySortData = [
+    {title:"Party Name (Asc)",sortType:"asc",key:"partyName"},
+    {title:"Party Name (Desc)",sortType:"desc",key:"partyName"},
+    {title:"Created At (Asc)",sortType:"asc",key:"createdAt"},
+    {title:"Created At (Desc)",sortType:"desc",key:"createdAt"},
+]
+
+export const partyFilterData = [
+    {labelName:"Party Name",inputType:"text",inputName:"partyName"},
+]
+
+export const invoiceSortData = [
+    {title:"Invoice No (Asc)",sortType:"asc",key:"invoiceNumber"},
+    {title:"Invoice No (Desc)",sortType:"desc",key:"invoiceNumber"},
+    {title:"Invoice Date (Asc)",sortType:"asc",key:"invoiceDate"},
+    {title:"Invoice Date (Desc)",sortType:"desc",key:"invoiceDate"},
+]
+
+export const invoiceFilterData = [
+    {labelName:"Invoice No",inputType:"number",inputName:"invoiceNumber"},
+    {labelName:"Party Name",inputType:"text",inputName:"partyName"},
+    {labelName:"Invoice Date",inputType:"date",startDate:"invoiceStartDate",endDate:"invoiceEndDate",options:[{labelName:"Last 7 Days",labelValue:"7"},{labelName:"Last 14 Days",labelValue:"14"},{labelName:"Last 30 days",labelValue:"30"},{labelName:"Custom Date",labelValue:"-1"}]},
+    {labelName:"Payment Status",inputType:"checkbox",inputName:"paymentStatus",options:[{labelName:"Not Paid",labelValue:"NOT_PAID"},{labelName:"Partially Paid",labelValue:"PARTIALLY_PAID"},{labelName:"Paid",labelValue:"FULLY_PAID"}]}
 ]

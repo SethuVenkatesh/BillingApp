@@ -43,7 +43,6 @@ export function UserDetailsProvider({ children }) {
 
 
    useEffect(() => {
-    console.log("auth Token",authToken)
      if (authToken) {
        getFirmDetails();
     } else {

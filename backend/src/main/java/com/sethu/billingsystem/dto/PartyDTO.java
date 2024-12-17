@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 
 
-
-    @Data
+@Data
     public class PartyDTO {
         public interface View {
             interface External extends ResponseDTO.View.Public,AddressDTO.View.External,BankDTO.View.External{}
@@ -26,17 +26,21 @@ import lombok.Data;
         private String partyName;
         @JsonView(value = {PartyDTO.View.External.class})
         private String logoUrl;
+        @NotBlank(groups = {PartyDTO.View.Create.class},message = "Email Cannot Be Blank")
         @Email(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class}, message = "Email is invalid")
         @JsonView(value = {PartyDTO.View.External.class})
         private String email;
         @JsonView(value = {PartyDTO.View.External.class})
         private String gstNumber;
+        @NotBlank(groups = {PartyDTO.View.Create.class},message = "Mobile Number Cannot Be Blank")
         @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Mobile Number is invalid")
         @JsonView(value = {PartyDTO.View.External.class})
         private String mobileNumber;
-        @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Mobile Number is invalid")
+        @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Alternate Mobile Number is invalid")
         @JsonView(value = {PartyDTO.View.External.class})
         private String altMobileNumber;
+        @JsonView(value = {PartyDTO.View.External.class})
+        private LocalDateTime createdAt;
         @JsonView(value = {PartyDTO.View.External.class})
         private BankDTO bank;
         @JsonView(value = {PartyDTO.View.External.class})
