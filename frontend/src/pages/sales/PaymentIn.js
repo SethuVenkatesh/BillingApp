@@ -191,7 +191,7 @@ const PaymentIn = () => {
     <>
         {
             loading ? <Loader/> : (
-                <div className='p-4 m-2 border'>
+                <div className='p-4 m-2 border   '>
                     <p className='text-slate-500 mb-4 text-center capitalize font-bold text-lg'>Sales Invoice</p>
                     <div className='w-max ml-auto'>
                         <InputComponent inputType="date" labelName="Invoice Date" inputName="invoiceDate" inputValue={paymentInDetails.invoiceDate} jsonDetails={paymentInDetails} setJsonDetails={setPatymentInDetails} maxValue={maxDate}/>

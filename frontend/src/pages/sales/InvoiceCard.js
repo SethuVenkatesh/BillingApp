@@ -14,7 +14,6 @@ const InvoiceCard = ({invoiceDetails}) => {
     let allItems = invoiceDetails.invoiceItems;
     let totalQuantity = 0;
     for(let itemIndex = 0 ; itemIndex < allItems.length ;itemIndex++){
-      console.log(allItems[itemIndex])
       totalQuantity = totalQuantity + allItems[itemIndex].quantity;
     }
     return totalQuantity;
@@ -27,7 +26,7 @@ const InvoiceCard = ({invoiceDetails}) => {
   }
   
   return (
-    <div className='border border-gray-300 rounded-sm px-2 py-2 cursor-pointer min-w-[400px]' onClick={()=>{handleInvoice()}}>
+    <div className='border border-gray-300 rounded-sm px-2 py-2 cursor-pointer min-w-[400px] w-full flex flex-col' onClick={()=>{handleInvoice()}}>
         <div className='flex justify-between flex-wrap'>
             <div className='flex gap-x-2'>
               <p className='text-blue-800'>{Icons['receipt-icon']}</p>

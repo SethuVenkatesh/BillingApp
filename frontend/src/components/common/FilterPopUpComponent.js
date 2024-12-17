@@ -52,7 +52,6 @@ const FilterPopUpComponent = ({data,filterChanges,selectedFilter,resetFilter,app
           let today = new Date();
           const newDate = new Date();
           newDate.setDate(today.getDate() - parseInt(value));
-          console.log("today ",today,newDate)
           let maxDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
           let minDate = newDate.getFullYear() + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + ('0' + newDate.getDate()).slice(-2);
           setSelectedFilter({
@@ -85,13 +84,10 @@ const FilterPopUpComponent = ({data,filterChanges,selectedFilter,resetFilter,app
       let today = new Date();
       let inList = false;
       let maxDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
-      console.log("useFeect")
       for(let dayIndex = 0 ; dayIndex < days.length ; dayIndex++){
         const newDate = new Date();
         newDate.setDate(today.getDate() - parseInt(days[dayIndex]));
-        console.log("today ",today,newDate)
         let minDate = newDate.getFullYear() + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + ('0' + newDate.getDate()).slice(-2);
-        console.log(selectedFilter.invoiceStartDate,selectedFilter.invoiceEndDate,minDate,maxDate);
         if(selectedFilter.invoiceStartDate === minDate && selectedFilter.invoiceEndDate === maxDate){
           setDateIndex(days[dayIndex]);
           inList = true;

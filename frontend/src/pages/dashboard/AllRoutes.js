@@ -7,7 +7,7 @@ import Employees from '../employees/Employees'
 import Sales from '../sales/Sales'
 const AllRoutes = () => {
   return (
-    <div className='w-[calc(100vw-220px)] h-[100vh] p-4 overflow-y-auto'>
+    <div className='w-[calc(100vw-220px)] h-[100vh] p-2 overflow-y-auto'>
 
         <Routes>
             <Route path='' element={<Home/>}/>
