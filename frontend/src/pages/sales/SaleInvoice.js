@@ -98,9 +98,7 @@ const resetFilter = () =>{
 
     const handleScroll = () => {
       let container = scrollContainerRef.current;
-
-      // console.log("scrollTop",'scrollHeight','clientHeight',container.scrollTop,container.scrollHeight,container.clientHeight);
-      if (parseInt(container.scrollHeight - container.scrollTop) + 1 === container.clientHeight) {
+      if (parseInt(container.scrollHeight - container.scrollTop)  === container.clientHeight) {
         setScrollHeight(container.scrollTop);
         if(totalPages > currentPage){
           getAllInvoice(currentPage + 1 ,20);

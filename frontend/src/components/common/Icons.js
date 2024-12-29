@@ -26,6 +26,7 @@ import SortIcon from '@mui/icons-material/Sort';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const Icons = {
     "arrow-right-icon":<ChevronRightIcon/>,
@@ -55,7 +56,8 @@ const Icons = {
     "arrow-outward-icons":<ArrowOutwardIcon/>,
     "sort-icon":<SortIcon/>,
     "filter-icon":<FilterAltIcon/>,
-    "close-icon":<CloseIcon/>
+    "close-icon":<CloseIcon/>,
+    "download-icon":<DownloadIcon/>
 }
 
 export default Icons;

@@ -1,12 +1,16 @@
 package com.sethu.billingsystem.controller;
 
+import com.cloudinary.Api;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.lowagie.text.DocumentException;
 import com.sethu.billingsystem.constants.PaymentStage;
 import com.sethu.billingsystem.dto.InvoiceDTO;
 import com.sethu.billingsystem.dto.InvoicePartyDTO;
 import com.sethu.billingsystem.dto.InvoicePaymentDTO;
 import com.sethu.billingsystem.model.ApiResponse;
 import com.sethu.billingsystem.service.InvoiceService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Date;
 
 @Controller
@@ -57,5 +62,11 @@ public class InvoiceController {
     @PostMapping("/payments")
     public ResponseEntity <ApiResponse<Object>> makePayments(@RequestParam Long invoiceNumber, @RequestBody InvoicePaymentDTO requestBody){
         return invoiceService.makePayment(invoiceNumber,requestBody);
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<ApiResponse<Object>> downloadInvoice(@RequestParam Long invoiceNumber) throws DocumentException, IOException {
+
+         return invoiceService.downloadInvoice(invoiceNumber);
     }
 }

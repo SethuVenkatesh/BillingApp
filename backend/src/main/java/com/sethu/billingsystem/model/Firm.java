@@ -22,7 +22,7 @@ public class Firm {
     @Column(name = "firm_name")
     private String firmName;
     @Column(name = "logo_url")
-    private String logoUrl;
+    private String logoUrl ;
     @Column(name = "email_id")
     private String email;
     @Column(name = "GST_number")
