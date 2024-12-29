@@ -71,6 +71,35 @@ const InvoiceDetails = () => {
             setToastStatus(false);
         })
     }
+
+    const handleDownloadInvoice = () =>{
+        AuthorizedApi.get("/invoice/download?invoiceNumber="+invoiceDetail.invoiceNumber).then((res)=>{
+            let fileData = res.data.data;
+            // Convert base64-encoded PDF data to a Blob
+            const binaryString = window.atob(fileData);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const file = new Blob([bytes.buffer], { type: "application/pdf" });
+
+            // Create a download link for the PDF
+            const fileURL = URL.createObjectURL(file);
+            const link = document.createElement("a");                                                                                                                                                       
+            link.href = fileURL;
+            link.download = "Invoice_"+invoiceDetail.invoiceNumber+"_"+invoiceDetail.invoiceDate ;
+            link.click();
+
+            // Clean up
+            URL.revokeObjectURL(fileURL);
+
+        }).catch(err=>{
+            console.log(err);
+        })
+
+     
+    }
     useEffect(()=>{
         let {invoiceData} = state;
         getInvoiceDetails(invoiceData.invoiceNumber)
@@ -87,7 +116,7 @@ const InvoiceDetails = () => {
             <PopupComponent isOpen={showPopUp} onCloseFn={()=>onCloseFn()} popUpTitle={popUpTitle} isBtnVisible={false} >
                 <PaymentStatus totalAmount={invoiceDetail.totalPrice} paymentStatus={invoiceDetail.paymentStatus} invoiceNumber={invoiceDetail.invoiceNumber} getInvoiceDetails={getInvoiceDetails} onCloseFn={onCloseFn}/>
             </PopupComponent>
-            <div className='p-2 border border-gray-400 w-3/4 min-h-[90vh] flex flex-col justify-between shadow-md'>
+            <div className='p-2 border border-gray-400 min-w-[800px] min-h-[90vh] flex flex-col justify-between shadow-md'>
                 <div>
                 <div className='flex gap-x-4 mb-2 pb-2 border-b-2'>
                     <div className='w-[75px] h-[75px] border border-gray-200 shadow-md rounded-full overflow-hidden'>
@@ -130,7 +159,7 @@ const InvoiceDetails = () => {
                         <th className="py-2 px-4 border-b-2 border-gray-300">Item</th>
                         <th className="py-2 px-4 border-b-2 border-gray-300">Quantity</th>
                         <th className="py-2 px-4 border-b-2 border-gray-300">Price (In &#8377;)</th>
-                        <th className="py-2 px-4 border-b-2 border-gray-300">Total</th>
+                        <th className="py-2 px-4 border-b-2 border-gray-300">Amount</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -198,17 +227,19 @@ const InvoiceDetails = () => {
                 </div>
             </div>
             <div className='p-4 flex-1 '>
-                <div className=' m-auto '>
-                    <p className='mb-2 font-semibold text-slate-500'>Payment Status : <span className={`rounded-md font-semibold p-1 text-md  ${invoiceDetail.paymentStatus == "FULLY_PAID" ? 'text-green-600 ':(invoiceDetail.paymentStatus == "NOT_PAID" ? 'text-red-600  ':'text-yellow-600  ')} `}>{invoiceDetail.paymentStatus}</span></p>
-                    <p className='text-white mb-2 m-auto text-center bg-blue-500 px-4 cursor-pointer py-2 rounded-sm font-semibold text-md ' onClick={()=>handleEditInvoice()}>{Icons['edit-icon']} Edit Invoice</p>
-                    <p className='text-white m-auto text-center bg-blue-500 px-4 cursor-pointer py-2 rounded-sm font-semibold text-md mb-2 ' onClick={()=>setShowPopUp(true)}>{Icons['payment-icon']} Add Payment</p>
+                <p className='mb-2 font-semibold text-slate-500'>Payment Status : <span className={`rounded-md font-semibold p-1 text-md  ${invoiceDetail.paymentStatus == "FULLY_PAID" ? 'text-green-600 ':(invoiceDetail.paymentStatus == "NOT_PAID" ? 'text-red-600  ':'text-yellow-600  ')} `}>{invoiceDetail.paymentStatus}</span></p>
+                <div className=' m-auto flex  gap-x-2 flex-wrap'>
+                    <p className='text-white mb-2 text-center bg-blue-500 px-4 cursor-pointer py-2 rounded-sm font-semibold text-md ' onClick={()=>handleEditInvoice()}>{Icons['edit-icon']} Edit Invoice</p>
+                    <p className='text-white  text-center bg-blue-500 px-4 cursor-pointer py-2 rounded-sm font-semibold text-md mb-2 ' onClick={()=>setShowPopUp(true)}>{Icons['payment-icon']} Add Payment</p>
+                    <p className='text-white mb-2  text-center bg-blue-500 px-4 cursor-pointer py-2 rounded-sm font-semibold text-md ' onClick={()=>handleDownloadInvoice()}>{Icons['download-icon']} Download Invoice</p>
+
+                </div>
+                <div className='w-auto mt-4 mb-2 '>
+                    <Accordian expand={paymentExpand} setExpand={setPaymentExpand} title={accordianTitle} callBackfn = {()=>getAllPayments(invoiceDetail.invoiceNumber)} >
+                        <PaymentAccordianItem/>
+                    </Accordian> 
                 </div>
             </div>
-        </div>
-        <div className='w-auto mt-4 mb-2'>
-            <Accordian expand={paymentExpand} setExpand={setPaymentExpand} title={accordianTitle} callBackfn = {()=>getAllPayments(invoiceDetail.invoiceNumber)} >
-                <PaymentAccordianItem/>
-             </Accordian> 
         </div>
         </>
 

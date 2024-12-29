@@ -1,5 +1,7 @@
 package com.sethu.billingsystem.service;
 
+
+import com.lowagie.text.DocumentException;
 import com.sethu.billingsystem.constants.PaymentStage;
 import com.sethu.billingsystem.dto.InvoiceDTO;
 import com.sethu.billingsystem.dto.InvoiceItemDTO;
@@ -11,25 +13,37 @@ import com.sethu.billingsystem.repository.InvoiceItemRepository;
 import com.sethu.billingsystem.repository.InvoicePaymentRepository;
 import com.sethu.billingsystem.repository.InvoiceRepository;
 import com.sethu.billingsystem.specification.InvoiceSpecification;
-import com.sethu.billingsystem.utils.CommonUtil;
-import com.sethu.billingsystem.utils.FirmUtil;
-import com.sethu.billingsystem.utils.InvoiceUtil;
-import com.sethu.billingsystem.utils.UserUtil;
+import com.sethu.billingsystem.utils.*;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
+
+
 
 @Service
 public class InvoiceService {
@@ -56,6 +70,13 @@ public class InvoiceService {
     PaymentMapper paymentMapper;
     @Autowired
     InvoiceUtil invoiceUtil;
+
+    @Autowired
+    PdfUtil pdfUtil;
+
+    @Autowired
+    private TemplateEngine templateEngine;
+
     public ResponseEntity<ApiResponse<Object>> createInvoice(InvoiceDTO requestBody) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
@@ -246,4 +267,31 @@ public class InvoiceService {
         ApiResponse<Object> response = new ApiResponse<>(true,"Invoice Details fetched successfully",invoiceDTO);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
+    public ResponseEntity<ApiResponse<Object>> downloadInvoice(Long invoiceNumber) throws DocumentException, IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        Customer user = userUtil.getUserDetails(userName);
+        Firm firmDetails = firmUtil.getFirmDetails(user.getUserId());
+        if (firmDetails == null) {
+            ApiResponse<Object> response = new ApiResponse<>(false, "User Don't have any firm", null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Invoice invoice = invoiceRepository.findByInvoiceNumberAndFirmFirmId(invoiceNumber, firmDetails.getFirmId());
+        if (invoice == null) {
+            ApiResponse<Object> response = new ApiResponse<>(false, "invoice not found", null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        String templateName = "invoiceTemplate";
+        Context context = new Context();
+        context.setVariable("invoice", invoice);
+        context.setVariable("firm",firmDetails);
+        context.setVariable("amount",util.convertToIndianCurrency(invoice.getTotalPrice()));
+        String fileName = invoice.getInvoiceDate()+"-"+"Invoice-"+invoice.getInvoiceId();
+        ByteArrayOutputStream pdfStream = pdfUtil.generatePdf(templateName,fileName,context,invoice);
+        ApiResponse<Object> response = new ApiResponse<>(true,"PDF Downloaded Successfully",pdfStream.toByteArray());
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+
 }

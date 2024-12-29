@@ -5,7 +5,7 @@ const PaymentAccordianItem = ({index,data}) => {
 
   return (
     data &&
-    <div className='grid grid-cols-4 border-b-2 p-2'>
+    <div className='grid lg:grid-cols-4 border-b-2 p-2 md:grid-cols-1'>
         <div className='col-span-3'>
             <p className='font-semibold text-sky-500 text-md '>{data.paymentMode}</p>
             <p className='text-sm font-semibold text-gray-500'>{data.paymentDate}</p>

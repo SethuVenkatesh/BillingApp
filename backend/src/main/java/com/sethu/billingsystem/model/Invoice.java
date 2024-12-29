@@ -53,7 +53,7 @@ public class Invoice {
     @Column(name = "subtotal_price",precision = 10,scale = 2)
     private BigDecimal subtotalPrice;
 
-    @OneToMany(mappedBy = "invoice",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "invoice",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     List<InvoiceItem> invoiceItems;
 
     @Column(name = "created_at")

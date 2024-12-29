@@ -33,7 +33,7 @@ const Accordian = ({expand,setExpand,title,callBackfn,children}) => {
  },[])
  
   return (
-    <div className='border border-gray-300 rounded-sm '>
+    <div className='border border-gray-300 rounded-sm min-w-[250px]'>
         <div className='p-2 border-b-2 text-slate-600 font-semibold flex items-center justify-between'>
             <p className=''>{title}</p>
             <p className='border-l-2 pl-2 cursor-pointer' onClick={()=>{handleExpand()}}>

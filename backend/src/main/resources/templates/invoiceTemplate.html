@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap}"
+      rel='stylesheet' type='text/css' />
+<head>
+    <style>
+        *{box-sizing: border-box;margin:0px;}
+        body { font-family: Arial, sans-serif;box-sizing: border-box;margin:0px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead,tbody{
+            width:100%;
+
+        }
+        th{
+            background-color:#3B82F6;
+            color:white;
+            font-size:14px;
+            border: 1px solid gray;
+            padding: 5px; text-align: left;
+        }
+        td {
+            border: 0.5px solid gray;padding: 8px; text-align: left;
+            font-size:14px;
+        }
+
+        .title{
+            text-align:center;
+            padding:2px 2px;
+            background-color:#3B82F6;
+            color:white;
+            width:100px;
+            font-weight:600;
+            border-radius:3px;
+            float:none;
+            margin-bottom: 10px;
+            margin-left: 42%;
+            font-size:12px;
+
+        }
+        .header-container {
+            width:100%;
+            border:0.5px solid gray;
+            display: table;
+            border-radius:3px;
+        }
+        .header-right{
+            width:80%;
+            text-align:right;
+            float:right;
+            padding:5px;
+        }
+        .header-left{
+            width:20%;
+            text-align:left;
+            float:left;
+            padding:5px;
+        }
+        .header-left img{
+            width:40px;
+            height:40px;
+            border-radius:100%;
+            margin-top:10px;
+            margin-left:5px;
+        }
+        .header-right h5{
+           font-size:14px;
+           text-transform:capitalize;
+           margin-bottom: 4px;
+
+        }
+        .header-right-text {
+            font-size:14px;
+            margin-bottom: 4px;
+
+        }
+        .text-bold{
+            font-weight:600;
+
+        }
+        .details-container{
+            width:100%;
+            display:table;
+            border:0.5px solid gray;
+
+        }
+        .details-container-left{
+            width:60%;
+            text-align:left;
+            float:left;
+            padding:5px;
+            border-right:0.5px solid gray;
+        }
+        .details-container-right{
+            width:40%;
+            text-align:right;
+            float:right;
+            padding:5px;
+            margin-top:10px;
+        }
+         .total-container{
+            width:100%;
+            display:table;
+            border:0.5px solid gray;
+        }
+        .total-container p{
+            padding:5px;
+        }
+        .total-container-left{
+            width:50%;
+            text-align:left;
+            float:left;
+
+        }
+        .total-container-right{
+            width:50%;
+            text-align:right;
+            float:right;
+            border-left:0.5px solid gray;
+        }
+        .total-container-right-wrapper{
+            width:100%;
+        }
+        .width-half{
+            width:50%;
+        }
+        .left{
+            float:left;
+            text-align:left;
+        }
+        .right{
+            float:right;
+            text-align:right;
+        }
+        .total-container-right hr{
+            border:1px solid gray !important;
+        }
+        .text-heading{
+            background-color:#3B82F6;
+            color:white;
+            font-size:14px;
+
+        }
+        .container{
+           border:0.5px solid gray;
+        }
+        .gst-container{
+            width:100%;
+            border-bottom:0.5px solid gray;
+        }
+        .footer-container{
+            width:100%;
+            display:table;
+            border:0.5px solid gray;
+        }
+        .footer-container p{
+            padding:5px;
+        }
+        .footer-container-left{
+            width:50%;
+            text-align:left;
+            float:left;
+            border-right:0.5px solid gray;
+        }
+        .footer-container-right{
+            width:50%;
+            float:right;
+        }
+        .footer-container-right img{
+            width:100px;
+            height:40px;
+            margin-top:10px;
+            margin-left:50px;
+        }
+         .footer-container-right p{
+            margin-left:50px;
+        }
+
+
+        .totals { text-align: right; }
+    </style>
+</head>
+<body>
+<p class="title">Tax Invoice</p>
+<div class="header-container">
+    <div class="header-left">
+<!--        <img src="https://res.cloudinary.com/dkjcfh7oj/image/upload/v1713684716/firms/building_1_jc8pct.png"/>-->
+        <img th:src="${firm.logoUrl != '' and firm.logoUrl != ' ' ? firm.logoUrl : 'https://res.cloudinary.com/dkjcfh7oj/image/upload/v1713684716/firms/building_1_jc8pct.png'} " alt="No image" />
+    </div>
+    <div class="header-right">
+        <h5 th:inline="text" class="header-right-text" >[[${firm.firmName}]]</h5>
+        <p th:inline="text" class="header-right-text" >[[${firm.address.address}]] , [[${firm.address.city}]]</p>
+        <p th:inline="text" class="header-right-text" >Phone No : [[${firm.mobileNumber}]] Email : [[${firm.email}]]</p>
+        <p th:inline="text" class="header-right-text" >GSTIN : [[${firm.gstNumber}]] ,[[${firm.address.state}]] - [[${firm.address.pincode}]]</p>
+    </div>
+</div>
+<div class="details-container">
+    <div class="details-container-left">
+        <p th:inline="text" class="header-right-text text-bold" >[[${invoice.invoiceParty.partyName}]]</p>
+        <p th:inline="text" class="header-right-text" >[[${invoice.invoiceParty.address.address}]] , [[${invoice.invoiceParty.address.city}]]</p>
+        <p th:inline="text" class="header-right-text" >[[${invoice.invoiceParty.address.state}]] - [[${invoice.invoiceParty.address.pincode}]]</p>
+        <p th:if="${invoice.includeGst}" th:inline="text" class="header-right-text" >GSTIN : [[${invoice.invoiceParty.gstNumber}]]</p>
+    </div>
+    <div class="details-container-right">
+        <p th:inline="text" class="header-right-text" >Invoice No : [[${invoice.invoiceNumber}]]</p>
+        <p th:inline="text" class="header-right-text" >Date : [[${invoice.invoiceDate}]]</p>
+    </div>
+</div>
+<table>
+    <thead>
+    <tr class="text-bold">
+        <th>S.No</th>
+        <th>Item Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item ,iter : ${invoice.invoiceItems}">
+        <td th:text="${iter.index + 1}"></td>
+        <td th:text="${item.itemName}"></td>
+        <td th:text="${item.quantity}"></td>
+        <td th:text="${item.price}"></td>
+        <td th:text="${item.price * item.quantity}"></td>
+    </tr>
+    </tbody>
+</table>
+<div class="total-container">
+    <div class="total-container-left">
+        <p class="text-heading text-bold">Total Amount In Words</p>
+        <p class="header-right-text">[[${amount}]]</p>
+    </div>
+    <div class="total-container-right">
+        <p class="text-heading text-bold">Amounts</p>
+        <div class="total-container-right-wrapper">
+            <p class="header-right-text left width-half">Subtotal :</p>
+            <p th:inline="text" class="header-right-text " >&#8377; [[${invoice.subtotalPrice}]]</p>
+        </div>
+        <div class="total-container-right-wrapper">
+            <p th:inline="text" class="header-right-text left width-half">GST ([[${invoice.cgstPer + invoice.sgstPer}]]%) :</p>
+            <p th:inline="text" class="header-right-text " > &#8377; [[${invoice.cgstPrice + invoice.sgstPrice}]]</p>
+        </div>
+        <hr/>
+        <div class="total-container-right-wrapper">
+            <p class="header-right-text left width-half text-bold">Total :</p>
+            <p th:inline="text" class="header-right-text text-bold" >&#8377; [[${invoice.totalPrice}]]</p>
+        </div>
+    </div>
+</div>
+
+
+<div th:if="${invoice.includeGst}" class="gst-container ">
+    <table>
+        <thead>
+        <tr class="text-bold">
+            <th>Tax Type</th>
+            <th>Taxable Amount</th>
+            <th>Rate</th>
+            <th>Tax Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr >
+            <td >SGST</td>
+            <td th:text="${invoice.subtotalPrice}"></td>
+            <td th:text="${invoice.sgstPer}"></td>
+            <td th:text="${invoice.sgstPrice}"></td>
+        </tr>
+        <tr >
+            <td >CGST</td>
+            <td th:text="${invoice.subtotalPrice}"></td>
+            <td th:text="${invoice.cgstPer}"></td>
+            <td th:text="${invoice.cgstPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer-container">
+    <div class="footer-container-left">
+        <p class="text-heading text-bold">Bank Details</p>
+        <div class="footer-container-left-wrapper">
+            <p th:inline="text" class="header-right-text " >Bank : [[${firm.bank.bankName}]]</p>
+            <p th:inline="text" class="header-right-text " >Branch : [[${firm.bank.branch}]]</p>
+            <p th:inline="text" class="header-right-text " >Account Number : [[${firm.bank.accountNumber}]]</p>
+            <p th:inline="text" class="header-right-text " >IFSC Code : [[${firm.bank.ifscCode}]]</p>
+        </div>
+    </div>
+    <div class="footer-container-right">
+        <img th:src="@{https://c8.alamy.com/comp/2AC1K1G/grunge-blue-signature-word-round-rubber-seal-stamp-on-white-background-2AC1K1G.jpg} " alt="No image" />
+        <p class="text-bold">Authorized Signature</p>
+    </div>
+</div>
+</body>
+</html>
