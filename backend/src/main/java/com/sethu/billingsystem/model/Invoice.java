@@ -25,32 +25,32 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoiceId;
-    @Column(name = "invoice_number")
+    @Column(name = "invoice_number",length = 20,nullable = false)
     private Long invoiceNumber;
     @ManyToOne
-    @JoinColumn(name = "firm_id")
+    @JoinColumn(name = "firm_id",nullable = false)
     private Firm firm;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoice_party_id")
+    @JoinColumn(name = "invoice_party_id",nullable = false)
     private InvoiceParty invoiceParty;
     @Temporal(TemporalType.DATE)
-    @Column(name = "invoice_date")
+    @Column(name = "invoice_date",nullable = false)
     private Date invoiceDate;
-    @Column(name = "payment_status")
+    @Column(name = "payment_status",nullable = false)
     private PaymentStage paymentStatus = PaymentStage.NOT_PAID;
-    @Column(name = "include_gst")
+    @Column(name = "include_gst",nullable = false)
     private Boolean includeGst = false;
-    @Column(name = "cgst_per",precision = 4,scale = 2)
+    @Column(name = "cgst_per",precision = 4,scale = 2,nullable = false)
     private BigDecimal cgstPer;
-    @Column(name = "sgst_per",precision = 4,scale = 2)
+    @Column(name = "sgst_per",precision = 4,scale = 2,nullable = false)
     private BigDecimal sgstPer;
-    @Column(name = "cgst_price",precision = 10,scale = 2)
+    @Column(name = "cgst_price",precision = 10,scale = 2,nullable = false)
     private BigDecimal cgstPrice;
-    @Column(name = "sgst_price",precision = 10,scale = 2)
+    @Column(name = "sgst_price",precision = 10,scale = 2,nullable = false)
     private BigDecimal sgstPrice;
-    @Column(name = "total_price",precision = 10,scale = 2)
+    @Column(name = "total_price",precision = 10,scale = 2,nullable = false)
     private BigDecimal totalPrice;
-    @Column(name = "subtotal_price",precision = 10,scale = 2)
+    @Column(name = "subtotal_price",precision = 10,scale = 2,nullable = false)
     private BigDecimal subtotalPrice;
 
     @OneToMany(mappedBy = "invoice",cascade = CascadeType.ALL,fetch = FetchType.EAGER)

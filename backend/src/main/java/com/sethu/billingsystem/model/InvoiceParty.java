@@ -16,18 +16,18 @@ public class InvoiceParty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoicePartyId;
-    @Column(name = "party_name")
+    @Column(name = "party_name",length = 50,nullable = false)
     private String partyName;
-    @Column(name = "email_id")
+    @Column(name = "email_id",length = 50)
     private String email;
-    @Column(name = "GST_number")
+    @Column(name = "GST_number",length = 15)
     private String gstNumber;
-    @Column(name = "mobile_number")
+    @Column(name = "mobile_number",nullable = false,length = 10)
     private String mobileNumber;
-    @Column(name = "alt_mobile_number")
+    @Column(name = "alt_mobile_number",length = 10)
     private String altMobileNumber;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id",nullable = false)
     private Address address;
     @Column(name = "created_at")
     @CreationTimestamp

@@ -20,12 +20,12 @@ public class InvoicePayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoicePaymentId;
-    @Column(name = "payment_date")
+    @Column(name = "payment_date",nullable = false)
     @Temporal(TemporalType.DATE)
     private Date paymentDate;
-    @Column(name = "payment_mode")
+    @Column(name = "payment_mode",nullable = false,length = 30)
     private String paymentMode;
-    @Column(name = "amount_paid",precision = 10,scale = 2)
+    @Column(name = "amount_paid",precision = 10,scale = 2,nullable = false)
     private BigDecimal amountPaid;
     @ManyToOne
     private Invoice invoice;

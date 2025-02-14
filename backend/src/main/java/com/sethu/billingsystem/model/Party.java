@@ -15,25 +15,26 @@ public class Party {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long partyId;
-    @Column(name = "party_name")
+    @Column(name = "party_name",nullable = false,length = 25)
     private String partyName;
     @Column(name = "logo_url")
     private String logoUrl;
-    @Column(name = "email_id")
+    @Column(name = "email_id",length = 50,nullable = false)
     private String email;
-    @Column(name = "GST_number")
+    @Column(name = "GST_number",length = 15)
     private String gstNumber;
-    @Column(name = "mobile_number")
+    @Column(name = "mobile_number",length = 10)
     private String mobileNumber;
-    @Column(name = "alt_mobile_number")
+    @Column(name = "alt_mobile_number",length = 10)
     private String altMobileNumber;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "firm_id",nullable = false)
     private Firm firm;
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn(name = "bank_id")
+    @JoinColumn(name = "bank_id",nullable = false)
     private Bank bank;
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id",nullable = false)
     private Address address;
     @Column(name = "created_at")
     @CreationTimestamp

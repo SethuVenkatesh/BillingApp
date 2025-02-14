@@ -16,11 +16,12 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long itemId;
-    @Column(name = "item_name")
+    @Column(name = "item_name",length = 50,nullable = false)
     private String itemName;
-    @Column(name = "price",precision = 8,scale = 2)
+    @Column(name = "price",precision = 8,scale = 2,nullable = false)
     private BigDecimal price;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "party_id",nullable = false)
     private Party party;
     @Column(name = "created_at")
     @CreationTimestamp

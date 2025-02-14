@@ -21,11 +21,11 @@ public class InvoiceItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoiceItemId;
-    @Column(name = "item_name")
+    @Column(name = "item_name",length = 50,nullable = false)
     private String itemName;
-    @Column(name = "price",precision = 10,scale = 2)
+    @Column(name = "price",precision = 10,scale = 2,nullable = false)
     private BigDecimal price;
-    @Column(name = "quantity")
+    @Column(name = "quantity",nullable = false)
     private Long quantity;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id",nullable = false)

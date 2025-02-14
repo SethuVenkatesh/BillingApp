@@ -19,25 +19,26 @@ public class Firm {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long firmId;
-    @Column(name = "firm_name")
+    @Column(name = "firm_name",nullable = false,unique = true,length = 50)
     private String firmName;
     @Column(name = "logo_url")
     private String logoUrl ;
-    @Column(name = "email_id")
+    @Column(name = "email_id",length = 50)
     private String email;
-    @Column(name = "GST_number")
+    @Column(name = "GST_number",length = 15)
     private String gstNumber;
-    @Column(name = "mobile_number")
+    @Column(name = "mobile_number",length = 10)
     private String mobileNumber;
-    @Column(name = "alt_mobile_number")
+    @Column(name = "alt_mobile_number",length = 10)
     private String altMobileNumber;
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn(name = "bank_id")
+    @JoinColumn(name = "bank_id",nullable = false)
     private Bank bank;
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id",nullable = false)
     private Address address;
     @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id",nullable = false)
     private Customer user;
     @Column(name = "created_at")
     @CreationTimestamp

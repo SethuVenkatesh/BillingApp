@@ -1,10 +1,10 @@
 package com.sethu.billingsystem.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -28,15 +28,23 @@ import java.time.LocalDateTime;
         private String logoUrl;
         @NotBlank(groups = {PartyDTO.View.Create.class},message = "Email Cannot Be Blank")
         @Email(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class}, message = "Email is invalid")
+        @Size(groups = {PartyDTO.View.Create.class,PartyDTO.View.Update.class},max = 50,min = 5,message = "email must be between 5 to 50 characters")
         @JsonView(value = {PartyDTO.View.External.class})
         private String email;
         @JsonView(value = {PartyDTO.View.External.class})
+        @Pattern(groups = {PartyDTO.View.Update.class, PartyDTO.View.Create.class},
+                regexp = "^$|^[0-9a-zA-Z]{15}$",
+                message = "GST number is invalid")
         private String gstNumber;
         @NotBlank(groups = {PartyDTO.View.Create.class},message = "Mobile Number Cannot Be Blank")
-        @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Mobile Number is invalid")
+        @Pattern(groups = {PartyDTO.View.Update.class, PartyDTO.View.Create.class},
+                regexp = "^$|^[0-9]{10}$",
+                message = "Mobile Number must be exactly 10 digits")
         @JsonView(value = {PartyDTO.View.External.class})
         private String mobileNumber;
-        @Size(groups ={PartyDTO.View.Update.class,PartyDTO.View.Create.class},min = 10,max = 10,message = "Alternate Mobile Number is invalid")
+        @Pattern(groups = {PartyDTO.View.Update.class, PartyDTO.View.Create.class},
+            regexp = "^$|^[0-9]{10}$",
+            message = "Alternate Mobile Number must be exactly 10 digits")
         @JsonView(value = {PartyDTO.View.External.class})
         private String altMobileNumber;
         @JsonView(value = {PartyDTO.View.External.class})

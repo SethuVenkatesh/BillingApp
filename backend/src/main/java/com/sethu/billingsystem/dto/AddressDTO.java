@@ -14,11 +14,11 @@ public class AddressDTO {
     @JsonView(value = {View.Internal.class})
     private Long addressId;
     @NotBlank(groups = {InvoiceDTO.View.Create.class},message = "address cannot be blank")
-    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 25,message = "Address must be between 5 to 25 characters")
+    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 50,message = "Address must be between 5 to 50 characters")
     @JsonView(value = {View.External.class})
     private String address;
     @NotBlank(groups = {InvoiceDTO.View.Create.class},message = "city name cannot be blank")
-    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 25,message = "City must be between 5 to 25 characters")
+    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 50,message = "City must be between 5 to 50 characters")
     @JsonView(value = {View.External.class})
     private String city;
     @NotBlank(groups = {InvoiceDTO.View.Create.class},message = "state name cannot be blank")

@@ -2,13 +2,10 @@ import React,{ useState,useEffect,useContext,useRef,useLayoutEffect }  from 'rea
 import Loader from '../../components/common/Loader'
 import {AuthorizedApi} from '../../axios'
 import { UserDetailsContext } from '../../context/userContext'
-import InputComponent from '../../components/common/InputComponent'
 import FilterPopUpComponent from '../../components/common/FilterPopUpComponent'
 import SortPopUpComponent from '../../components/common/SortPopUpComponent'
 import { invoiceSortData,invoiceFilterData } from '../../constants'
 import InvoiceCard from './InvoiceCard'
-import { StarRate } from '@mui/icons-material'
-
 const SaleInvoice = () => {   
     const [loading,setLoading] = useState(false);
     const { firmDetails } = useContext(UserDetailsContext);

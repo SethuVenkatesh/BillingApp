@@ -17,10 +17,11 @@ public class Bank {
     private Long bankId;
     @Column(name = "account_number")
     private Long accountNumber;
-    @Column(name = "bank_name")
+    @Column(name = "bank_name",length = 50)
     private String bankName;
+    @Column(name = "branch",length = 20)
     private String branch;
-    @Column(name = "IFSC_code")
+    @Column(name = "IFSC_code",length = 20)
     private String ifscCode;
 //    @OneToOne(mappedBy = "bank")
 //    private Firm firm;

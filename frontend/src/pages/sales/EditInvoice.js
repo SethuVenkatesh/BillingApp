@@ -27,7 +27,7 @@ let today = new Date();
     includeGST:false,
     invoiceDate:maxDate
   })
-  const [addedItems,setAddedItems] = useState([{item_name:"Item 1",price:10,quantity:1}])
+  const [addedItems,setAddedItems] = useState([{itemName:"Item 1",price:10,quantity:1}])
   const [toastMsg,setToastMsg] =useState("");
   const [toastStatus,setToastStatus] = useState(false);
   const [showGST,setShowGST] = useState(false);
@@ -356,7 +356,7 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
         setItemSearchQuery(res);
         setItemData({
             ...itemData,
-            item_name:res,
+            itemName:res,
         })
     }
 
@@ -375,9 +375,9 @@ const ItemComponent = ({itemDetails,itemIndex,setAddedItems,allItems,setToastSta
                 customLoading = {<>Loading...</>}
                 onSelect = {(res) => 
                     {
-                        setItemData({...itemData,item_name:res.item_name,price:res.price})
+                        setItemData({...itemData,itemName:res.itemName,price:res.price})
                         const allItemsModified = [...allItems];
-                        allItemsModified[itemIndex] = {...allItemsModified[itemIndex],item_name:res.item_name,price:res.price};
+                        allItemsModified[itemIndex] = {...allItemsModified[itemIndex],itemName:res.itemName,price:res.price};
                         setAddedItems(allItemsModified);  
                     }
                 }

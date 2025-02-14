@@ -64,7 +64,6 @@ export const newPartySchemaValidation = Yup.object().shape({
   partyName:Yup.string().min(5,"party name must be atleast 5 characters").required("party name is required"),
   email: Yup.string().email('Invalid email address').required('Email is required'),
   mobileNumber: Yup.string().matches("^\\d{10}$","Mobile number must be 10 digits").required('Mobile Number is required'),
-  altMobileNumber: Yup.string().matches("^\\d{10}$","Alternate Mobile number must be 10 digits"),
   bank: Yup.object().shape({
     bankName:Yup.string().required("Bank Name is required"),
     accountNumber:Yup.string().required("Account Number is required"),
@@ -100,7 +99,6 @@ export const invoiceValidation = Yup.object().shape({
     partyName:Yup.string().min(5,"party name must be atleast 5 characters").required("party name is required"),
     email: Yup.string().email('Invalid email address').required('Email is required'),
     mobileNumber: Yup.string().matches("^\\d{10}$","Mobile number must be 10 digits").required('Mobile Number is required'),
-    altMobileNumber: Yup.string().matches("^\\d{10}$","Mobile number must be 10 digits"),
     address: Yup.object().shape({
       address:Yup.string().required("address is required"),
       city:Yup.string().required("city is required"),

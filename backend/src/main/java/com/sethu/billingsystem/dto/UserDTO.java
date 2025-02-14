@@ -30,6 +30,7 @@ public class UserDTO {
     private String mobileNumber;
     @JsonView(value = {UserDTO.View.Details.class,UserDTO.View.Update.class})
     @NotBlank(groups = {UserDTO.View.Create.class},message = "Email cannot be blank")
+    @Size(groups = {UserDTO.View.Create.class,UserDTO.View.Update.class},max = 50,min = 5,message = "email must be between 5 to 50 characters")
     @Email(groups = {UserDTO.View.Update.class,UserDTO.View.Create.class},message = "Email Id is invalid")
     private String email;
     @JsonView(value = {UserDTO.View.Details.class})
