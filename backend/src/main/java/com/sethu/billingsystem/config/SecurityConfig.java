@@ -6,6 +6,7 @@ import com.sethu.billingsystem.filter.CsrfCookieFilter;
 import com.sethu.billingsystem.filter.JwtTokenGenertionFilter;
 import com.sethu.billingsystem.filter.JwtTokenValidationFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -39,6 +40,11 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
+
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 //        CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
@@ -47,7 +53,7 @@ public class SecurityConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://billing-app-alpha.vercel.app"));
+                        corsConfiguration.setAllowedOrigins(Collections.singletonList(frontendUrl));
                         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
