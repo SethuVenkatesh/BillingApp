@@ -19,7 +19,7 @@ public class ItemDTO {
     }
     @JsonView(value = {ItemDTO.View.Internal.class})
     private Long itemId;
-    @Size(groups = {ItemDTO.View.Create.class,ItemDTO.View.Update.class},min = 5, max = 50,message = "Item Name must be 5 and 50 characters")
+    @Size(groups = {ItemDTO.View.Create.class,ItemDTO.View.Update.class},min = 5, max = 100,message = "Item Name must be 5 and 100 characters")
     @NotBlank(groups = {ItemDTO.View.Create.class},message = "Item Name Cannot Be Blank")
     @JsonView(value = {ItemDTO.View.External.class})
     private String itemName;

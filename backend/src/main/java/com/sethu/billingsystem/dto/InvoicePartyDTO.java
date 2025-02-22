@@ -18,7 +18,7 @@ public class InvoicePartyDTO {
         interface Update extends PartyDTO.View.External {}
     }
 
-    @Size(groups = {InvoicePartyDTO.View.Create.class,InvoicePartyDTO.View.Update.class,InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 50,message = "Party Name must be between 5 to 50 characters")
+    @Size(groups = {InvoicePartyDTO.View.Create.class,InvoicePartyDTO.View.Update.class,InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5, max = 100,message = "Party Name must be between 5 to 100 characters")
     @NotBlank(groups = {InvoicePartyDTO.View.Create.class,InvoiceDTO.View.Create.class},message = "Party Name Cannot Be Blank")
     @JsonView(value = {InvoicePartyDTO.View.External.class})
     private String partyName;

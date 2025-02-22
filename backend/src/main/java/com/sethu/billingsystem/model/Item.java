@@ -16,7 +16,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long itemId;
-    @Column(name = "item_name",length = 50,nullable = false)
+    @Column(name = "item_name",length = 100,nullable = false)
     private String itemName;
     @Column(name = "price",precision = 8,scale = 2,nullable = false)
     private BigDecimal price;

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
         }
         @JsonView(value = {PartyDTO.View.Internal.class})
         private Long partyId;
-        @Size(groups = {PartyDTO.View.Create.class,PartyDTO.View.Update.class},min = 5, max = 25,message = "Party Name must be between 5 to 25 characters")
+        @Size(groups = {PartyDTO.View.Create.class,PartyDTO.View.Update.class},min = 5, max = 100,message = "Party Name must be between 5 to 100 characters")
         @NotBlank(groups = {PartyDTO.View.Create.class},message = "Party Name Cannot Be Blank")
         @JsonView(value = {PartyDTO.View.External.class})
         private String partyName;

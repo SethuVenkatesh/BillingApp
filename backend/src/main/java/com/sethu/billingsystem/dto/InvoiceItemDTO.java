@@ -15,7 +15,7 @@ public class InvoiceItemDTO {
         interface Update extends External {}
     }
     @NotBlank(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},message = "Item Name Cannot be blank")
-    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5,max = 50,message = "Item name must be between 5 to 50 characters")
+    @Size(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},min = 5,max = 100,message = "Item name must be between 5 to 100 characters")
     @JsonView(value = InvoiceItemDTO.View.External.class)
     private String itemName;
     @NotNull(groups = {InvoiceDTO.View.Create.class,InvoiceDTO.View.Update.class},message = "Item Price Cannot be null")

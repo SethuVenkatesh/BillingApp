@@ -16,7 +16,7 @@ public class InvoiceParty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long invoicePartyId;
-    @Column(name = "party_name",length = 50,nullable = false)
+    @Column(name = "party_name",length = 100,nullable = false)
     private String partyName;
     @Column(name = "email_id",length = 50)
     private String email;

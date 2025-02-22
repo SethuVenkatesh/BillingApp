@@ -15,7 +15,7 @@ public class Party {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long partyId;
-    @Column(name = "party_name",nullable = false,length = 25)
+    @Column(name = "party_name",nullable = false,length = 100)
     private String partyName;
     @Column(name = "logo_url")
     private String logoUrl;
